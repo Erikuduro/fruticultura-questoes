@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulado Interativo — Manga & Banana</title>
+<style>
+  :root{
+    --green:#2e7d32;
+    --green-light:#e8f5e9;
+    --red:#c62828;
+    --red-light:#ffebee;
+    --blue:#1565c0;
+    --blue-light:#e3f2fd;
+    --amber:#f9a825;
+    --bg:#f4f6f5;
+    --card:#ffffff;
+    --text:#20302a;
+    --muted:#6b7a74;
+    --border:#dde5e1;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    padding-bottom:60px;
+  }
+  header{
+    background:linear-gradient(135deg,#1b5e20,#2e7d32 60%,#558b2f);
+    color:#fff;
+    padding:20px 16px 16px;
+    position:sticky;
+    top:0;
+    z-index:10;
+    box-shadow:0 2px 8px rgba(0,0,0,0.15);
+  }
+  header h1{
+    margin:0 0 4px;
+    font-size:1.25rem;
+  }
+  header p{
+    margin:0;
+    font-size:0.85rem;
+    opacity:0.9;
+  }
+  .toolbar{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-top:12px;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .tabs{
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+  }
+  .tab-btn{
+    background:rgba(255,255,255,0.15);
+    border:1px solid rgba(255,255,255,0.4);
+    color:#fff;
+    padding:7px 14px;
+    border-radius:20px;
+    font-size:0.85rem;
+    cursor:pointer;
+    transition:0.15s;
+  }
+  .tab-btn.active{
+    background:#fff;
+    color:var(--green);
+    font-weight:600;
+  }
+  .score-panel{
+    display:flex;
+    gap:14px;
+    align-items:center;
+    font-size:0.85rem;
+  }
+  .score-badge{
+    background:rgba(255,255,255,0.15);
+    border-radius:10px;
+    padding:6px 12px;
+    text-align:center;
+    min-width:70px;
+  }
+  .score-badge b{
+    display:block;
+    font-size:1.05rem;
+  }
+  .reset-btn{
+    background:#fff;
+    color:var(--green);
+    border:none;
+    padding:7px 14px;
+    border-radius:20px;
+    font-size:0.8rem;
+    font-weight:600;
+    cursor:pointer;
+  }
+  main{
+    max-width:760px;
+    margin:0 auto;
+    padding:18px 14px 40px;
+  }
+  .culture-heading{
+    margin:26px 0 10px;
+    font-size:1.05rem;
+    font-weight:700;
+    color:var(--green);
+    display:flex;
+    align-items:center;
+    gap:8px;
+    border-bottom:2px solid var(--border);
+    padding-bottom:6px;
+  }
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:16px 16px 12px;
+    margin-bottom:14px;
+    box-shadow:0 1px 3px rgba(0,0,0,0.04);
+  }
+  .q-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:10px;
+    margin-bottom:8px;
+  }
+  .q-num{
+    font-weight:700;
+    color:var(--blue);
+    font-size:0.95rem;
+  }
+  .q-points{
+    font-size:0.72rem;
+    color:var(--muted);
+    background:var(--blue-light);
+    padding:2px 8px;
+    border-radius:10px;
+    white-space:nowrap;
+  }
+  .q-instruction{
+    font-size:0.92rem;
+    margin-bottom:10px;
+    line-height:1.4;
+  }
+  .item-row{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    padding:9px 8px;
+    border-radius:8px;
+    margin-bottom:6px;
+    background:#fafcfb;
+    border:1px solid var(--border);
+    transition:0.15s;
+  }
+  .item-text{
+    flex:1;
+    font-size:0.88rem;
+    line-height:1.4;
+  }
+  .btn-group{
+    display:flex;
+    gap:6px;
+    flex-shrink:0;
+  }
+  .vf-btn{
+    border:1px solid #b7c4bd;
+    background:#fff;
+    color:var(--text);
+    font-weight:700;
+    width:34px;
+    height:32px;
+    border-radius:7px;
+    cursor:pointer;
+    font-size:0.85rem;
+  }
+  .vf-btn:hover{ background:#eef3f0; }
+  .item-row.correct{
+    background:var(--green-light);
+    border-color:var(--green);
+  }
+  .item-row.incorrect{
+    background:var(--red-light);
+    border-color:var(--red);
+  }
+  .item-explain{
+    display:none;
+    font-size:0.8rem;
+    color:var(--muted);
+    margin-top:6px;
+    padding-top:6px;
+    border-top:1px dashed var(--border);
+  }
+  .item-explain.show{ display:block; }
+  .item-explain b{ color:var(--text); }
+  .option-btn{
+    display:block;
+    width:100%;
+    text-align:left;
+    background:#fafcfb;
+    border:1px solid var(--border);
+    padding:9px 12px;
+    border-radius:8px;
+    margin-bottom:7px;
+    font-size:0.88rem;
+    cursor:pointer;
+    color:var(--text);
+    transition:0.15s;
+  }
+  .option-btn:hover{ background:#eef3f0; }
+  .option-btn.correct{
+    background:var(--green-light);
+    border-color:var(--green);
+    font-weight:600;
+  }
+  .option-btn.incorrect{
+    background:var(--red-light);
+    border-color:var(--red);
+  }
+  .option-btn.disabled{
+    cursor:default;
+  }
+  .single-explain{
+    display:none;
+    font-size:0.82rem;
+    color:var(--muted);
+    margin-top:4px;
+    padding:8px 10px;
+    background:#f6f8f7;
+    border-radius:8px;
+  }
+  .single-explain.show{ display:block; }
+  .single-explain b{ color:var(--text); }
+  .icon-ok, .icon-no{
+    font-weight:800;
+    margin-left:4px;
+  }
+  .icon-ok{ color:var(--green); }
+  .icon-no{ color:var(--red); }
+  footer{
+    text-align:center;
+    font-size:0.75rem;
+    color:var(--muted);
+    padding:20px;
+  }
+  @media (max-width:480px){
+    .score-panel{ font-size:0.75rem; gap:8px; }
+    .score-badge{ min-width:56px; padding:5px 8px; }
+    header h1{ font-size:1.05rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🌱 Simulado Interativo — Fruticultura</h1>
+  <p>Manga &amp; Banana · 15 questões por cultura · correção instantânea</p>
+  <div class="toolbar">
+    <div class="tabs">
+      <button class="tab-btn active" data-filter="todas">Todas</button>
+      <button class="tab-btn" data-filter="manga">Manga</button>
+      <button class="tab-btn" data-filter="banana">Banana</button>
+    </div>
+    <div class="score-panel">
+      <div class="score-badge">Acertos<br><b id="scoreCorrect">0</b></div>
+      <div class="score-badge">Respondidas<br><b id="scoreAnswered">0</b></div>
+      <div class="score-badge">Total<br><b id="scoreTotal">0</b></div>
+      <button class="reset-btn" id="resetBtn">Reiniciar</button>
+    </div>
+  </div>
+</header>
+
+<main id="quizContainer"></main>
+
+<footer>Revisão gerada a partir do material da disciplina · boa prova!</footer>
+
+<script>
+const quizData = [
+// ===================== MANGA =====================
+{ id:"m1", culture:"manga", type:"block", mode:"VF", points:"2,0 pontos",
+  instruction:"Julgue as sentenças abaixo em Verdadeiras (V) ou Falsas (F):",
+  items:[
+    { text:"O paclobutrazol (PBZ) deve ser aplicado via foliar diretamente sobre a copa da mangueira, dispensando a irrigação posterior.", answer:false,
+      explain:"PBZ é aplicado via solo (drench sob a copa) e exige irrigação logo após, para levar o produto às raízes." },
+    { text:"A eficiência do PBZ está relacionada à cultivar, ao vigor da planta e ao efeito residual de aplicações anteriores, sendo a dose para 'Kent' e 'Haden' geralmente maior que para 'Tommy Atkins'.", answer:true,
+      explain:"'Kent' e 'Haden' são mais vigorosas e exigem dose maior que a cultivar-padrão 'Tommy Atkins'." },
+    { text:"As pulverizações com nitrato de potássio devem ser realizadas em ramos ainda jovens, com menos de 90 dias, para garantir maior absorção foliar.", answer:false,
+      explain:"O nitrato só deve ser aplicado em ramos maduros — nunca com menos de 90 dias." },
+    { text:"O estresse hídrico, quando utilizado no manejo da floração, tem como objetivo antecipar a maturação e a lignificação dos ramos vegetativos.", answer:true,
+      explain:"Correto: a redução de água acelera o repouso/maturação dos ramos." },
+    { text:"A antracnose da mangueira, causada por Colletotrichum gloeosporioides, é favorecida por baixa umidade relativa e ausência de chuvas durante a floração.", answer:false,
+      explain:"É o oposto: antracnose é favorecida por ALTA umidade relativa e chuva durante a floração." }
+  ]
+},
+{ id:"m2", culture:"manga", type:"block", mode:"CE", points:"2,0 pontos",
+  instruction:"Responda Certo (C) ou Errado (E):",
+  items:[
+    { text:"A poda de formação da mangueira é realizada anualmente, logo após cada colheita, com o objetivo de eliminar ramos doentes e restos de colheita.", answer:false,
+      explain:"A poda de formação é única, feita na implantação do pomar. A anual/pós-colheita é a poda de produção/limpeza." },
+    { text:"As cultivares 'Espada' e 'Coquinho', por serem poliembriônicas, são preferencialmente utilizadas como porta-enxerto, pois garantem maior uniformidade genética das mudas.", answer:true,
+      explain:"Correto: poliembrionia gera plantas clonais da matriz, garantindo uniformidade." },
+    { text:"A poda de abertura central consiste em eliminar ramos com ângulo de inserção maior que 45° em relação ao tronco.", answer:false,
+      explain:"É o contrário: eliminam-se ramos com ângulo MENOR que 45°." },
+    { text:"A poda mais severa da mangueira deve ser evitada quando a floração é programada para o período de altas temperaturas e precipitação elevada.", answer:true,
+      explain:"Correto: nessa época recomenda-se poda menos severa, aguardando 2-3 fluxos antes do retardante." }
+  ]
+},
+{ id:"m3", culture:"manga", type:"single", points:"1,0 ponto",
+  question:"Sobre o mecanismo fisiológico do paclobutrazol, é correto afirmar que ele:",
+  options:[
+    "Estimula a síntese de giberelinas nas raízes.",
+    "Inibe a biossíntese de giberelinas, favorecendo a diferenciação floral em detrimento do crescimento vegetativo.",
+    "Substitui a necessidade de irrigação após sua aplicação.",
+    "É eficiente apenas quando aplicado via foliar sobre panículas.",
+    "Atua exclusivamente como fungicida sistêmico."
+  ],
+  correct:1,
+  explain:"O PBZ bloqueia a rota biossintética das giberelinas, paralisando o crescimento vegetativo e favorecendo a indução floral."
+},
+{ id:"m4", culture:"manga", type:"single", points:"1,0 ponto",
+  question:"Quanto às doenças fúngicas da mangueira, considere: I. A antracnose é favorecida por chuva e alta umidade relativa durante o florescimento. II. A seca-da-mangueira (Ceratocystis fimbriata) é disseminada principalmente pela broca Hypocryphalus mangiferae e pode levar a planta à morte. III. O oídio é favorecido por alta umidade relativa e ausência de vento. IV. A morte descendente (Lasiodiplodia theobromae) é favorecida por estresse hídrico/nutricional, entrando por ferimentos de poda. V. A malformação floral (Fusarium subglutinans) não guarda relação com o ácaro Aceria mangiferae. Estão corretas:",
+  options:[
+    "I, II e IV.",
+    "I, III e V.",
+    "II, III e IV.",
+    "I, II, III e IV.",
+    "Todas estão corretas."
+  ],
+  correct:0,
+  explain:"III é falsa (oídio é favorecido por BAIXA umidade relativa); V é falsa (a malformação está associada à ação do ácaro Aceria, que favorece a infecção por Fusarium)."
+},
+{ id:"m5", culture:"manga", type:"block", mode:"VF", points:"1,0 ponto",
+  instruction:"Quanto às pragas da mangueira, assinale V ou F:",
+  items:[
+    { text:"A mosca Ceratitis capitata é polífaga, com mais de 200 hospedeiros, e ataca preferencialmente frutos já amarelecidos ou maduros.", answer:true, explain:"Correto." },
+    { text:"As espécies do gênero Anastrepha possuem hospedeiros mais específicos e ovipositam preferencialmente em frutos verdes ou 'de vez'.", answer:true, explain:"Correto." },
+    { text:"O ácaro Aceria mangiferae não guarda relação com a disseminação de doenças fúngicas na mangueira.", answer:false, explain:"Falso: é o principal vetor do Fusarium spp., causador da malformação." },
+    { text:"A cochonilha Aulacaspis tubercularis é considerada a espécie de maior importância para pomares destinados à exportação.", answer:true, explain:"Correto: provoca manchas/deformações que desqualificam o fruto para exportação." },
+    { text:"A técnica do inseto estéril (TIE) consiste na liberação de fêmeas estéreis para competir com machos selvagens.", answer:false, explain:"Falso: são liberados MACHOS estéreis para copular com fêmeas selvagens, gerando ovos inviáveis." }
+  ]
+},
+{ id:"m6", culture:"manga", type:"single", points:"1,0 ponto",
+  question:"Sobre os porta-enxertos utilizados na propagação da mangueira, é correto afirmar:",
+  options:[
+    "'Tommy Atkins' e 'Haden' são as cultivares mais utilizadas como porta-enxerto por serem poliembriônicas.",
+    "'Espada' e 'Coquinho' são poliembriônicas e mais utilizadas como porta-enxerto, sendo a 'Espada' mais vigorosa e tolerante à seca-da-mangueira.",
+    "A propagação por sementes monoembriônicas é preferível para formação de porta-enxertos, por garantir uniformidade genética.",
+    "O porta-enxerto deve ser sempre obtido por estaquia, nunca por sementes.",
+    "Não há diferença de vigor entre as cultivares utilizadas como porta-enxerto."
+  ],
+  correct:1,
+  explain:"'Espada' e 'Coquinho' são poliembriônicas; a 'Espada' é mais vigorosa e tolerante à seca-da-mangueira."
+},
+{ id:"m7", culture:"manga", type:"block", mode:"CE", points:"1,0 ponto",
+  instruction:"Responda Certo (C) ou Errado (E):",
+  items:[
+    { text:"A mangueira necessita de um período seco de cerca de 4 meses, seguido de estação chuvosa prolongada, para floração regular.", answer:false,
+      explain:"É o inverso: o período seco de referência é mais longo (~8 meses) e o chuvoso mais curto (~4 meses)." },
+    { text:"O ponto de colheita da manga pode ser determinado pela coloração da polpa e pela idade do fruto em dias após a floração.", answer:true, explain:"Correto." },
+    { text:"O tratamento hidrotérmico para controle de mosca-das-frutas em manga destinada à exportação consiste na imersão em água quente entre 75 e 90 minutos, conforme o peso do fruto.", answer:true, explain:"Correto (46,1°C, 75min para frutos <425g ou 90min para frutos maiores)." }
+  ]
+},
+{ id:"m8", culture:"manga", type:"single", points:"1,0 ponto",
+  question:"Assinale a alternativa que apresenta a sequência correta de manejo para indução floral da mangueira em condições irrigadas do Semiárido:",
+  options:[
+    "Aplicação de nitrato → poda pós-colheita → aplicação de PBZ → colheita.",
+    "Poda pós-colheita → emissão de fluxos vegetativos → aplicação de PBZ e/ou estresse hídrico → maturação dos ramos → aplicação de nitrato → floração.",
+    "Aplicação de PBZ → poda de formação → colheita → aplicação de nitrato.",
+    "Estresse hídrico → poda severa → aplicação simultânea de PBZ e nitrato.",
+    "Nenhuma sequência de manejo é necessária; a floração ocorre espontaneamente em qualquer época."
+  ],
+  correct:1,
+  explain:"Sequência correta: poda → fluxos vegetativos → PBZ/estresse hídrico → maturação dos ramos → nitrato → floração."
+},
+{ id:"m9", culture:"manga", type:"single", points:"1,0 ponto",
+  question:"Quanto à nutrição mineral da mangueira, considere: I. É uma das culturas mais exigentes em cálcio, com teores foliares de Ca próximos ao dobro dos de N. II. A deficiência de cálcio está associada ao colapso interno (soft nose). III. O potássio deve ser aplicado em maior proporção logo após a colheita, correspondendo a 50% da dose anual. IV. Zn e B são os micronutrientes com deficiência mais comum. V. A calagem deve ser evitada em pomares com pH já elevado, mesmo com baixos teores de Ca. Estão corretas:",
+  options:[
+    "I, II e IV.",
+    "I, II, III e IV.",
+    "II, III e V.",
+    "Apenas I e II.",
+    "Todas estão corretas."
+  ],
+  correct:0,
+  explain:"III é falsa (50% do N — não do K — é aplicado pós-colheita; o K pós-colheita é 25%); V é falsa (nesse caso usa-se gesso, não se deve evitar a correção de Ca)."
+},
+{ id:"m10", culture:"manga", type:"block", mode:"VF", points:"1,0 ponto",
+  instruction:"Julgue em Verdadeiro (V) ou Falso (F):",
+  items:[
+    { text:"A manga é um fruto climatérico e deve ser colhida no ponto de maturidade fisiológica, ainda com a casca predominantemente verde.", answer:true, explain:"Correto." },
+    { text:"A escala de maturação por cor de polpa varia de creme a alaranjado/amarelo intenso, sendo um indicador auxiliar quando a aparência externa não é suficiente.", answer:true, explain:"Correto." },
+    { text:"Frutos de manga destinados à exportação dispensam qualquer tratamento pós-colheita contra mosca-das-frutas quando a área de produção não apresenta histórico da praga.", answer:false,
+      explain:"Falso: o tratamento hidrotérmico é exigido pelos países importadores (USDA) independentemente do histórico local." }
+  ]
+},
+{ id:"m11", culture:"manga", type:"single", points:"1,0 ponto",
+  question:"Mangifera indica pertence a qual família botânica?",
+  options:["Rutaceae","Anacardiaceae","Musaceae","Myrtaceae","Bromeliaceae"],
+  correct:1,
+  explain:"A mangueira pertence à família Anacardiaceae."
+},
+{ id:"m12", culture:"manga", type:"block", mode:"VF", points:"1,0 ponto",
+  instruction:"Julgue em Verdadeiro (V) ou Falso (F):",
+  items:[
+    { text:"A semente de manga perde rapidamente o poder germinativo, devendo ser semeada em até 15 dias após a extração do fruto.", answer:true, explain:"Correto." },
+    { text:"A garfagem de fenda cheia é um método de enxertia que utiliza porta-enxerto e garfo de diâmetros semelhantes (8 a 12 mm).", answer:true, explain:"Correto." },
+    { text:"A propagação por sementes monoembriônicas garante uniformidade genética idêntica à planta matriz.", answer:false,
+      explain:"Falso: sementes monoembriônicas geram variabilidade genética (segregação). Só as poliembriônicas clonam a matriz." }
+  ]
+},
+{ id:"m13", culture:"manga", type:"single", points:"1,0 ponto",
+  question:"Qual cultivar de manga é caracterizada pela autoincompatibilidade, exigindo cultivares polinizadoras no pomar?",
+  options:["Tommy Atkins","Espada","Haden","Rosa","Keitt"],
+  correct:2,
+  explain:"A 'Haden' apresenta acentuada autoincompatibilidade, exigindo outras variedades para polinização."
+},
+{ id:"m14", culture:"manga", type:"single", points:"1,0 ponto",
+  question:"Quanto às exigências climáticas e edáficas da mangueira, considere: I. Um período seco de 4 meses seguido de 8 meses chuvosos é ideal para a floração regular. II. A profundidade do solum (horizontes A+B) determina o volume de solo explorado pelas raízes. III. Regiões áridas/semiáridas irrigadas favorecem maior radiação solar, melhorando a coloração dos frutos. IV. A umidade do ar estimula a brotação das flores, sendo as chuvas favoráveis nesta fase. Estão corretas:",
+  options:["I e II","II e III","I, III e IV","II, III e IV","Todas"],
+  correct:1,
+  explain:"I está invertida (o ideal é ~4 meses chuvosos seguidos de ~8 meses secos); IV está errada na parte final (as chuvas são DESfavoráveis na fase de floração)."
+},
+{ id:"m15", culture:"manga", type:"block", mode:"VF", points:"1,0 ponto",
+  instruction:"Julgue em Verdadeiro (V) ou Falso (F):",
+  items:[
+    { text:"O tratamento com cera de carnaúba aplicado na pós-colheita tem função apenas estética, sem relação com a fisiologia de conservação do fruto.", answer:false,
+      explain:"Falso: a cera também modifica a atmosfera interna do fruto, contribuindo para a conservação (além do efeito estético)." },
+    { text:"A temperatura ideal de armazenamento e transporte da manga está entre 10°C e 13°C.", answer:true, explain:"Correto." }
+  ]
+},
+
+// ===================== BANANA =====================
+{ id:"b1", culture:"banana", type:"block", mode:"VF", points:"2,0 pontos",
+  instruction:"Julgue as sentenças abaixo em Verdadeiras (V) ou Falsas (F):",
+  items:[
+    { text:"O sistema de condução 'mãe-filha-neta' consiste em manter apenas duas gerações por touceira, eliminando-se todo e qualquer rebento adicional.", answer:false,
+      explain:"Falso: mantêm-se TRÊS gerações — mãe, filha e neta." },
+    { text:"O desbaste da bananeira, realizado com a ferramenta 'lurdinha', deve remover inclusive a gema apical do rebento eliminado, evitando sua rebrota.", answer:true, explain:"Correto." },
+    { text:"O desbaste é geralmente realizado aos 4, 6 e 10 meses após o plantio.", answer:true, explain:"Correto." },
+    { text:"O excesso de rebentos na touceira favorece o aumento do tamanho e peso dos frutos, sendo recomendado manter o maior número possível de plantas-filhas.", answer:false,
+      explain:"Falso: o excesso de rebentos REDUZ o tamanho e peso dos frutos." },
+    { text:"A muda tipo 'chifrão' corresponde ao estágio com 0,20 a 0,30 m de altura e 2 a 3 meses de idade.", answer:false,
+      explain:"Falso: essa descrição é do 'chifrinho'. O 'chifrão' tem 0,60 a 1,50 m e 7 a 9 meses." }
+  ]
+},
+{ id:"b2", culture:"banana", type:"block", mode:"CE", points:"2,0 pontos",
+  instruction:"Responda Certo (C) ou Errado (E):",
+  items:[
+    { text:"As mudas micropropagadas são obtidas por cultura de tecidos em laboratórios (biofábricas) e são livres de pragas, doenças e nematoides.", answer:true, explain:"Correto." },
+    { text:"O chifrinho é o estágio de muda mais desenvolvido, já apto a emitir inflorescência.", answer:false,
+      explain:"Falso: o chifrinho é o estágio MENOS desenvolvido; o mais desenvolvido é a muda adulta." },
+    { text:"Em áreas com histórico de Mal-do-Panamá, recomenda-se preferencialmente o uso de mudas micropropagadas.", answer:true, explain:"Correto." },
+    { text:"O descorticamento da muda convencional consiste na retirada superficial do tecido escuro que envolve o rizoma, eliminando galerias de broca e lesões de nematoides.", answer:true, explain:"Correto." }
+  ]
+},
+{ id:"b3", culture:"banana", type:"single", points:"1,0 ponto",
+  question:"Por que o potássio é considerado o nutriente mais crítico para a bananeira?",
+  options:[
+    "Porque substitui integralmente a função do nitrogênio na síntese proteica.",
+    "Porque é o nutriente exigido em menor quantidade pela cultura.",
+    "Porque atua no transporte de fotoassimilados para os frutos e na regulação hídrica das células, refletindo no tamanho e peso do cacho.",
+    "Porque corrige a acidez do solo, dispensando a calagem.",
+    "Porque é absorvido exclusivamente pelas raízes mais velhas da planta."
+  ],
+  correct:2,
+  explain:"O K comanda o carregamento do floema (transporte de fotoassimilados) e a regulação osmótica, refletindo no enchimento do cacho."
+},
+{ id:"b4", culture:"banana", type:"single", points:"1,0 ponto",
+  question:"Quanto às principais doenças da bananeira, considere: I. O Mal-do-Panamá é causado por um fungo de solo (Fusarium oxysporum f.sp. cubense) que sobrevive por mais de 20 anos, sem cura, apenas resistência genética. II. O Moko (Ralstonia solanacearum) pode ser diferenciado do Mal-do-Panamá pelo teste do copo, que revela exsudato bacteriano leitoso. III. A Sigatoka amarela manifesta-se na face inferior da folha, e a negra na face superior. IV. A mancha de cordana é doença secundária que pode ser confundida com a Sigatoka amarela, mas não compromete significativamente a produção. V. O mosaico da bananeira é causado por bactéria disseminada por nematoides do solo. Estão corretas:",
+  options:["I, II e IV.","I, III e V.","II, III e IV.","I, II, IV e V.","Todas estão corretas."],
+  correct:0,
+  explain:"III está invertida (amarela = face superior; negra = face inferior); V é falsa (o mosaico é causado por VÍRUS — CMV — disseminado por pulgões, não bactéria)."
+},
+{ id:"b5", culture:"banana", type:"single", points:"1,0 ponto",
+  question:"Quanto à fitossanidade da bananeira, NÃO é correto afirmar:",
+  options:[
+    "O nematoide Radopholus similis (cavernícola) é o principal nematoide da cultura, causando tombamento de plantas.",
+    "A broca-do-rizoma (Cosmopolites sordidus) pode causar perdas de até 100% em variedades do tipo Comprida.",
+    "O manejo integrado da broca-do-rizoma inclui iscas atrativas associadas a Beauveria bassiana e armadilhas com feromônio.",
+    "A Sigatoka negra já está amplamente disseminada em todos os estados do Nordeste, sendo endêmica na região desde a década de 1980.",
+    "A variedade 'Maçã' é altamente suscetível ao Mal-do-Panamá."
+  ],
+  correct:3,
+  explain:"Falso: a Sigatoka negra ainda NÃO está disseminada no Nordeste — é motivo de alerta quarentenário, não doença endêmica na região."
+},
+{ id:"b6", culture:"banana", type:"block", mode:"VF", points:"1,0 ponto",
+  instruction:"Julgue em Verdadeiro (V) ou Falso (F):",
+  items:[
+    { text:"A ordem decrescente de exigência de macronutrientes pela bananeira é K > N > Ca > Mg > S > P.", answer:true, explain:"Correto." },
+    { text:"O déficit hídrico prolongado, comum em regiões de sequeiro como a Zona da Mata de Pernambuco, não representa fator limitante relevante para a cultura.", answer:false,
+      explain:"Falso: o déficit hídrico é justamente o principal fator limitante em cultivo de sequeiro." },
+    { text:"A calagem deve ser realizada com antecedência mínima de 30 a 60 dias antes do plantio.", answer:true, explain:"Correto." },
+    { text:"B e Zn são os micronutrientes com deficiência mais frequente na bananeira.", answer:true, explain:"Correto." },
+    { text:"Solos do tipo Gleissolo, comuns em várzeas, dispensam sistema de drenagem para o cultivo da bananeira.", answer:false,
+      explain:"Falso: Gleissolos têm lençol freático elevado e EXIGEM sistema de drenagem." }
+  ]
+},
+{ id:"b7", culture:"banana", type:"single", points:"1,0 ponto",
+  question:"Sobre a colheita da banana, é correto afirmar que:",
+  options:[
+    "É um fruto não-climatérico, devendo ser colhido apenas quando completamente maduro na planta.",
+    "É um fruto climatérico, devendo ser colhido ainda verde, cerca de 120 dias após a emissão da inflorescência.",
+    "Deve ser colhida apenas quando a casca apresentar coloração amarela uniforme.",
+    "A colheita independe da distância entre o local de produção e o ponto de venda.",
+    "Não há relação entre o corte do pseudocaule e o manejo da colheita."
+  ],
+  correct:1,
+  explain:"A banana é climatérica e deve ser colhida verde, ~120 dias após a emissão do 'coração'."
+},
+{ id:"b8", culture:"banana", type:"single", points:"1,0 ponto",
+  question:"Quanto aos grupos genômicos e cultivares de bananeira, considere: I. O grupo AAA inclui o subgrupo Cavendish (Nanica, Nanicão, Grande Naine) e a 'Maçã'. II. O grupo AAB corresponde aos tipos Prata/Pacovan e Terra/Comprida, geralmente mais rústicos. III. A 'Pacovan Ken' é um híbrido com melhor desempenho agronômico que a 'Pacovan' que lhe deu origem. IV. A 'Tropical', do tipo Maçã, é suscetível ao Mal-do-Panamá assim como sua cultivar de origem. V. Os grupos genômicos derivam do cruzamento entre Musa acuminata (genoma A) e Musa balbisiana (genoma B). Estão corretas:",
+  options:["I, II, III e V.","I, II, IV e V.","Apenas I, II e V.","Todas estão corretas.","Apenas III e IV."],
+  correct:0,
+  explain:"IV é falsa: a 'Tropical' é TOLERANTE ao Mal-do-Panamá, ao contrário da 'Maçã'."
+},
+{ id:"b9", culture:"banana", type:"block", mode:"CE", points:"1,0 ponto",
+  instruction:"Responda Certo (C) ou Errado (E):",
+  items:[
+    { text:"A climatização (maturação controlada) da banana utiliza etileno ou etephon, em câmaras com temperatura entre 13,9°C e 23,9°C e umidade relativa entre 85% e 95%.", answer:true, explain:"Correto." },
+    { text:"Bananas de variedades e origens diferentes podem ser climatizadas na mesma câmara sem prejuízo à uniformidade de maturação.", answer:false,
+      explain:"Falso: variedades/origens diferentes NÃO devem ser climatizadas juntas — maturação desuniforme." },
+    { text:"A classificação da banana tipo Prata/Pacovan considera o comprimento e o diâmetro do fruto, sendo frutos acima de 16 cm classificados como tipo exportação.", answer:true, explain:"Correto." }
+  ]
+},
+{ id:"b10", culture:"banana", type:"single", points:"1,0 ponto",
+  question:"Assinale a alternativa correta sobre o manejo do desbaste e da desfolha na bananeira:",
+  options:[
+    "A desfolha deve ser evitada, pois reduz a luminosidade e aumenta a incidência de Sigatoka.",
+    "O desbaste elimina apenas a parte aérea do rebento indesejado, preservando sua gema apical para rebrota controlada.",
+    "A desfolha remove folhas velhas e doentes, contribuindo para reduzir o inóculo de Sigatoka e melhorar a luminosidade do cacho.",
+    "O sistema mãe-filha-neta é aplicável apenas em cultivares do grupo AAA.",
+    "O desbaste deve ser realizado uma única vez, imediatamente após o plantio."
+  ],
+  correct:2,
+  explain:"A desfolha remove material doente/velho, reduzindo inóculo de Sigatoka e melhorando a luminosidade."
+},
+{ id:"b11", culture:"banana", type:"single", points:"1,0 ponto",
+  question:"A bananeira pertence a qual família botânica?",
+  options:["Musaceae","Anacardiaceae","Bromeliaceae","Poaceae","Caricaceae"],
+  correct:0,
+  explain:"A bananeira (Musa spp.) pertence à família Musaceae."
+},
+{ id:"b12", culture:"banana", type:"block", mode:"VF", points:"1,0 ponto",
+  instruction:"Julgue em Verdadeiro (V) ou Falso (F):",
+  items:[
+    { text:"O chifre é o estágio de muda com 0,30 a 0,60 m de altura.", answer:true, explain:"Correto." },
+    { text:"A muda adulta já está apta a emitir inflorescência.", answer:true, explain:"Correto." },
+    { text:"A micropropagação reserva geralmente 5% das mudas no viveiro para atender necessidades de replantio.", answer:true, explain:"Correto." }
+  ]
+},
+{ id:"b13", culture:"banana", type:"single", points:"1,0 ponto",
+  question:"Qual cultivar de banana é altamente suscetível ao Mal-do-Panamá, sendo cultivada apenas em áreas isentas da doença?",
+  options:["Pacovan","Maçã","Grande Naine","Thap Maeo","Comprida Verdadeira"],
+  correct:1,
+  explain:"A 'Maçã' é altamente suscetível ao Mal-do-Panamá, restrita a áreas sem histórico do fungo."
+},
+{ id:"b14", culture:"banana", type:"single", points:"1,0 ponto",
+  question:"Quanto à adubação verde e cobertura do solo na bananicultura, considere: I. Leguminosas como crotalária e mucuna-preta podem fixar entre 150 e 210 kg de N/ha/ano. II. A biomassa da própria bananeira (folhas e pseudocaule) pode ser usada como cobertura morta, devolvendo ao solo boa parte da matéria orgânica produzida. III. A adubação verde não contribui para o controle de plantas invasoras. IV. A cobertura morta com biomassa da bananeira deve ser mantida a uma espessura aproximada de 5 a 10 cm. Estão corretas:",
+  options:["I, II e IV.","I e III.","II e III.","Apenas IV.","Todas."],
+  correct:0,
+  explain:"III é falsa: a adubação verde/cobertura morta TAMBÉM ajuda a dificultar o desenvolvimento de plantas invasoras."
+},
+{ id:"b15", culture:"banana", type:"block", mode:"VF", points:"1,0 ponto",
+  instruction:"Julgue em Verdadeiro (V) ou Falso (F):",
+  items:[
+    { text:"A banana tipo Prata/Pacovan classificada como 'loré' corresponde a frutos com até 14 cm de comprimento.", answer:true, explain:"Correto." },
+    { text:"Frutos com diâmetro entre 29 e 38 mm ou mais, e mais de 16 cm de comprimento, são classificados como tipo exportação.", answer:true, explain:"Correto." }
+  ]
+}
+];
+
+let state = {}; // qid_or_itemkey -> {correct:bool}
+let currentFilter = "todas";
+
+function itemKey(qid, idx){ return qid + "-" + idx; }
+
+function totalUnits(filter){
+  let n = 0;
+  quizData.forEach(q=>{
+    if(filter!=="todas" && q.culture!==filter) return;
+    if(q.type==="block") n += q.items.length; else n += 1;
+  });
+  return n;
+}
+
+function updateScore(){
+  let total = totalUnits(currentFilter);
+  let answered = 0, correct = 0;
+  Object.keys(state).forEach(k=>{
+    if(currentFilter!=="todas" && state[k].culture!==currentFilter) return;
+    answered++;
+    if(state[k].correct) correct++;
+  });
+  document.getElementById("scoreTotal").textContent = total;
+  document.getElementById("scoreAnswered").textContent = answered;
+  document.getElementById("scoreCorrect").textContent = correct;
+}
+
+function renderQuiz(filter){
+  currentFilter = filter;
+  const container = document.getElementById("quizContainer");
+  container.innerHTML = "";
+  let lastCulture = null;
+  let qCounter = 0;
+
+  quizData.forEach(q=>{
+    if(filter!=="todas" && q.culture!==filter) return;
+
+    if(q.culture !== lastCulture){
+      lastCulture = q.culture;
+      const h = document.createElement("div");
+      h.className = "culture-heading";
+      h.textContent = (q.culture === "manga" ? "🥭 Manga" : "🍌 Banana");
+      container.appendChild(h);
+      qCounter = 0;
+    }
+    qCounter++;
+
+    const card = document.createElement("div");
+    card.className = "card";
+
+    const head = document.createElement("div");
+    head.className = "q-head";
+    head.innerHTML = `<span class="q-num">Questão ${qCounter}</span><span class="q-points">${q.points}</span>`;
+    card.appendChild(head);
+
+    if(q.type === "block"){
+      const instr = document.createElement("div");
+      instr.className = "q-instruction";
+      instr.textContent = q.instruction;
+      card.appendChild(instr);
+
+      const labelTrue = q.mode === "CE" ? "C" : "V";
+      const labelFalse = q.mode === "CE" ? "E" : "F";
+
+      q.items.forEach((item, idx)=>{
+        const key = itemKey(q.id, idx);
+        const row = document.createElement("div");
+        row.className = "item-row";
+        row.id = "row-" + key;
+
+        const txt = document.createElement("div");
+        txt.className = "item-text";
+        txt.innerHTML = item.text + `<div class="item-explain" id="explain-${key}"><b>Explicação:</b> ${item.explain}</div>`;
+
+        const btnGroup = document.createElement("div");
+        btnGroup.className = "btn-group";
+
+        const btnT = document.createElement("button");
+        btnT.className = "vf-btn";
+        btnT.textContent = labelTrue;
+        const btnF = document.createElement("button");
+        btnF.className = "vf-btn";
+        btnF.textContent = labelFalse;
+
+        function answerItem(userVal){
+          if(state[key] !== undefined) return; // já respondido
+          const isCorrect = (userVal === item.answer);
+          state[key] = { correct:isCorrect, culture:q.culture };
+          row.classList.add(isCorrect ? "correct" : "incorrect");
+          document.getElementById("explain-"+key).classList.add("show");
+          btnT.disabled = true; btnF.disabled = true;
+          updateScore();
+        }
+        btnT.addEventListener("click", ()=>answerItem(true));
+        btnF.addEventListener("click", ()=>answerItem(false));
+
+        btnGroup.appendChild(btnT);
+        btnGroup.appendChild(btnF);
+        row.appendChild(txt);
+        row.appendChild(btnGroup);
+        card.appendChild(row);
+      });
+
+    } else if(q.type === "single"){
+      const qtext = document.createElement("div");
+      qtext.className = "q-instruction";
+      qtext.textContent = q.question;
+      card.appendChild(qtext);
+
+      const optWrap = document.createElement("div");
+      const letters = ["A","B","C","D","E"];
+      const key = q.id;
+
+      q.options.forEach((optText, idx)=>{
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.innerHTML = `<b>${letters[idx]})</b> ${optText}`;
+        btn.addEventListener("click", ()=>{
+          if(state[key] !== undefined) return;
+          const isCorrect = (idx === q.correct);
+          state[key] = { correct:isCorrect, culture:q.culture };
+          Array.from(optWrap.children).forEach((child, cidx)=>{
+            child.classList.add("disabled");
+            child.disabled = true;
+            if(cidx === q.correct) child.classList.add("correct");
+            if(cidx === idx && !isCorrect) child.classList.add("incorrect");
+          });
+          const exp = document.getElementById("single-explain-"+key);
+          exp.classList.add("show");
+          updateScore();
+        });
+        optWrap.appendChild(btn);
+      });
+      card.appendChild(optWrap);
+
+      const exp = document.createElement("div");
+      exp.className = "single-explain";
+      exp.id = "single-explain-"+key;
+      exp.innerHTML = `<b>Explicação:</b> ${q.explain}`;
+      card.appendChild(exp);
+    }
+
+    container.appendChild(card);
+  });
+
+  updateScore();
+}
+
+document.querySelectorAll(".tab-btn").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    renderQuiz(btn.dataset.filter);
+  });
+});
+
+document.getElementById("resetBtn").addEventListener("click", ()=>{
+  state = {};
+  renderQuiz(currentFilter);
+});
+
+renderQuiz("todas");
+</script>
+</body>
+</html>
