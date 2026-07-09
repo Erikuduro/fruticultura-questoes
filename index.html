@@ -3,621 +3,1134 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Simulado Interativo — Manga & Banana</title>
+<title>Revisão de Provas — Hidrologia Agrícola &amp; Olericultura</title>
 <style>
   :root{
-    --green:#2e7d32;
-    --green-light:#e8f5e9;
-    --red:#c62828;
-    --red-light:#ffebee;
-    --blue:#1565c0;
-    --blue-light:#e3f2fd;
-    --amber:#f9a825;
-    --bg:#f4f6f5;
-    --card:#ffffff;
-    --text:#20302a;
-    --muted:#6b7a74;
-    --border:#dde5e1;
+    --bg:#f5f7f6; --card:#ffffff; --text:#1c2621; --muted:#5c6b64; --border:#dde4de;
+    /* Hidrologia */
+    --blue:#0d47a1; --blue2:#1565c0; --blue-light:#e3f0fd; --cyan:#00838f;
+    --red:#c62828; --red-light:#ffebee; --amber:#f9a825; --green-light:#e8f5e9;
+    /* Olericultura */
+    --green:#2e7d32; --green-dark:#1b5e20; --orange:#e65100; --orange-dark:#bf360c;
   }
   *{box-sizing:border-box;}
   body{
     margin:0;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background:var(--bg);
-    color:var(--text);
-    padding-bottom:60px;
+    background:var(--bg); color:var(--text); padding-bottom:40px; line-height:1.55;
   }
-  header{
-    background:linear-gradient(135deg,#1b5e20,#2e7d32 60%,#558b2f);
-    color:#fff;
-    padding:20px 16px 16px;
-    position:sticky;
-    top:0;
-    z-index:10;
-    box-shadow:0 2px 8px rgba(0,0,0,0.15);
+
+  /* ===== Shell: top-level discipline switcher ===== */
+  .top-header{
+    background:linear-gradient(100deg,#0d2c54 0%,#0d47a1 40%,#2e7d32 72%,#e65100 100%);
+    color:#fff; padding:16px 16px 14px; position:sticky; top:0; z-index:30;
+    box-shadow:0 2px 10px rgba(0,0,0,0.18);
   }
-  header h1{
-    margin:0 0 4px;
-    font-size:1.25rem;
+  .top-header h1{ margin:0 0 10px; font-size:1.15rem; }
+  .disc-switch{ display:flex; gap:8px; flex-wrap:wrap; }
+  .disc-btn{
+    background:rgba(255,255,255,0.16); border:1px solid rgba(255,255,255,0.5); color:#fff;
+    padding:9px 18px; border-radius:20px; font-size:0.88rem; font-weight:700; cursor:pointer;
   }
-  header p{
-    margin:0;
-    font-size:0.85rem;
-    opacity:0.9;
-  }
-  .toolbar{
-    display:flex;
-    gap:8px;
-    flex-wrap:wrap;
-    margin-top:12px;
-    align-items:center;
-    justify-content:space-between;
-  }
-  .tabs{
-    display:flex;
-    gap:6px;
-    flex-wrap:wrap;
-  }
-  .tab-btn{
-    background:rgba(255,255,255,0.15);
-    border:1px solid rgba(255,255,255,0.4);
-    color:#fff;
-    padding:7px 14px;
-    border-radius:20px;
-    font-size:0.85rem;
-    cursor:pointer;
-    transition:0.15s;
-  }
-  .tab-btn.active{
-    background:#fff;
-    color:var(--green);
-    font-weight:600;
-  }
-  .score-panel{
-    display:flex;
-    gap:14px;
-    align-items:center;
-    font-size:0.85rem;
-  }
-  .score-badge{
-    background:rgba(255,255,255,0.15);
-    border-radius:10px;
-    padding:6px 12px;
-    text-align:center;
-    min-width:70px;
-  }
-  .score-badge b{
-    display:block;
-    font-size:1.05rem;
-  }
-  .reset-btn{
-    background:#fff;
-    color:var(--green);
-    border:none;
-    padding:7px 14px;
-    border-radius:20px;
-    font-size:0.8rem;
-    font-weight:600;
-    cursor:pointer;
-  }
-  main{
-    max-width:760px;
-    margin:0 auto;
-    padding:18px 14px 40px;
-  }
-  .culture-heading{
-    margin:26px 0 10px;
-    font-size:1.05rem;
-    font-weight:700;
-    color:var(--green);
-    display:flex;
-    align-items:center;
-    gap:8px;
-    border-bottom:2px solid var(--border);
-    padding-bottom:6px;
-  }
+  .disc-btn.active{ background:#fff; color:#0d2c54; }
+
+  .discipline{ display:none; }
+  .discipline.active{ display:block; }
+
+  /* ===== Shared structural components (used by both disciplines) ===== */
+  main{ max-width:840px; margin:0 auto; padding:18px 14px 40px; }
+  section.page{ display:none; }
+  section.page.active{ display:block; }
+  h3.sub-title{ font-size:1.02rem; margin:20px 0 8px; }
+  p{ line-height:1.55; font-size:0.94rem; }
+  ul, ol{ line-height:1.55; font-size:0.94rem; padding-left:22px; }
+  li{ margin-bottom:4px; }
+
   .card{
-    background:var(--card);
-    border:1px solid var(--border);
-    border-radius:12px;
-    padding:16px 16px 12px;
-    margin-bottom:14px;
-    box-shadow:0 1px 3px rgba(0,0,0,0.04);
+    background:var(--card); border:1px solid var(--border); border-radius:11px;
+    padding:14px 17px; margin-bottom:14px; box-shadow:0 1px 3px rgba(0,0,0,0.04); font-size:0.93rem;
   }
-  .q-head{
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-start;
-    gap:10px;
-    margin-bottom:8px;
+  .card p{ margin:6px 0; }
+  .card ul, .card ol{ margin:6px 0; }
+
+  .formula-box{
+    background:#f4f9ff; border:1px solid #bcd4ee; border-radius:8px;
+    padding:13px 17px; margin:11px 0; overflow-x:auto;
   }
-  .q-num{
-    font-weight:700;
-    color:var(--blue);
-    font-size:0.95rem;
+  .formula-box .label{ font-size:0.78rem; color:var(--muted); margin-bottom:6px; font-weight:600; text-transform:uppercase; letter-spacing:.03em; }
+  .formula-box .desc{ font-size:0.85rem; color:var(--text); margin-top:8px; }
+  .formula-box .eq{ font-size:1.12rem; padding:6px 0; display:flex; align-items:center; flex-wrap:wrap; gap:2px; }
+  .frac{ display:inline-flex; flex-direction:column; vertical-align:middle; text-align:center; margin:0 4px; line-height:1.15; }
+  .frac .num{ border-bottom:1.6px solid var(--text); padding:0 5px 2px; }
+  .frac .den{ padding:2px 5px 0; }
+  .eq sub{ font-size:0.7em; }
+  .eq sup{ font-size:0.7em; }
+
+  .example-box{
+    background:#fffbea; border:1px solid #f0dfa0; border-left:4px solid var(--amber);
+    border-radius:8px; padding:13px 17px; margin:11px 0; font-size:0.88rem;
   }
-  .q-points{
-    font-size:0.72rem;
-    color:var(--muted);
-    background:var(--blue-light);
-    padding:2px 8px;
-    border-radius:10px;
-    white-space:nowrap;
+  .example-box .label{ font-weight:700; color:#8a6300; margin-bottom:6px; font-size:0.8rem; text-transform:uppercase; }
+
+  .diagram-box{
+    background:#fbfdff; border:1px solid var(--border); border-radius:10px;
+    padding:10px; margin:14px 0; text-align:center;
   }
-  .q-instruction{
-    font-size:0.92rem;
-    margin-bottom:10px;
-    line-height:1.4;
+  .diagram-box svg{ max-width:100%; height:auto; }
+  .diagram-caption{ font-size:0.78rem; color:var(--muted); margin-top:6px; }
+
+  .pitfall-box{
+    background:#fff0f0; border:1px solid #f3c1c1; border-left:4px solid var(--red);
+    border-radius:8px; padding:13px 17px; margin:10px 0; font-size:0.88rem;
   }
-  .item-row{
-    display:flex;
-    align-items:flex-start;
-    gap:10px;
-    padding:9px 8px;
-    border-radius:8px;
-    margin-bottom:6px;
-    background:#fafcfb;
-    border:1px solid var(--border);
-    transition:0.15s;
-  }
-  .item-text{
-    flex:1;
-    font-size:0.88rem;
-    line-height:1.4;
-  }
-  .btn-group{
-    display:flex;
-    gap:6px;
-    flex-shrink:0;
-  }
-  .vf-btn{
-    border:1px solid #b7c4bd;
-    background:#fff;
-    color:var(--text);
-    font-weight:700;
-    width:34px;
-    height:32px;
-    border-radius:7px;
-    cursor:pointer;
-    font-size:0.85rem;
-  }
+  .pitfall-box b{ color:var(--red); }
+
+  /* quiz engine (shared, used by both disciplines via distinct class names) */
+  .quiz-toolbar{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; justify-content:space-between; margin-bottom:14px; position:sticky; top:0; background:var(--bg); padding:8px 0; z-index:10; }
+  .quiz-tabs{ display:flex; gap:6px; flex-wrap:wrap; }
+  .score-panel{ display:flex; gap:10px; align-items:center; font-size:0.8rem; }
+  .score-badge{ border-radius:10px; padding:5px 10px; text-align:center; min-width:56px; }
+  .score-badge b{ display:block; font-size:1rem; }
+  .topic-heading{ margin:24px 0 10px; font-size:1.03rem; font-weight:700; border-bottom:2px solid var(--border); padding-bottom:6px; }
+  .q-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:8px; }
+  .q-num{ font-weight:700; font-size:0.95rem; }
+  .q-points{ font-size:0.72rem; color:var(--muted); padding:2px 8px; border-radius:10px; white-space:nowrap; }
+  .q-instruction{ font-size:0.9rem; margin-bottom:10px; line-height:1.4; }
+  .item-row{ display:flex; align-items:flex-start; gap:10px; padding:9px 8px; border-radius:8px; margin-bottom:6px; background:#fafcfd; border:1px solid var(--border); }
+  .item-text{ flex:1; font-size:0.87rem; line-height:1.4; }
+  .btn-group{ display:flex; gap:6px; flex-shrink:0; }
+  .vf-btn{ border:1px solid #b7c4bd; background:#fff; color:var(--text); font-weight:700; width:34px; height:32px; border-radius:7px; cursor:pointer; font-size:0.85rem; }
   .vf-btn:hover{ background:#eef3f0; }
-  .item-row.correct{
-    background:var(--green-light);
-    border-color:var(--green);
-  }
-  .item-row.incorrect{
-    background:var(--red-light);
-    border-color:var(--red);
-  }
-  .item-explain{
-    display:none;
-    font-size:0.8rem;
-    color:var(--muted);
-    margin-top:6px;
-    padding-top:6px;
-    border-top:1px dashed var(--border);
-  }
+  .item-row.correct{ background:var(--green-light); border-color:#2e7d32; }
+  .item-row.incorrect{ background:var(--red-light); border-color:var(--red); }
+  .item-explain{ display:none; font-size:0.8rem; color:var(--muted); margin-top:6px; padding-top:6px; border-top:1px dashed var(--border); }
   .item-explain.show{ display:block; }
   .item-explain b{ color:var(--text); }
-  .option-btn{
-    display:block;
-    width:100%;
-    text-align:left;
-    background:#fafcfb;
-    border:1px solid var(--border);
-    padding:9px 12px;
-    border-radius:8px;
-    margin-bottom:7px;
-    font-size:0.88rem;
-    cursor:pointer;
-    color:var(--text);
-    transition:0.15s;
-  }
-  .option-btn:hover{ background:#eef3f0; }
-  .option-btn.correct{
-    background:var(--green-light);
-    border-color:var(--green);
-    font-weight:600;
-  }
-  .option-btn.incorrect{
-    background:var(--red-light);
-    border-color:var(--red);
-  }
-  .option-btn.disabled{
-    cursor:default;
-  }
-  .single-explain{
-    display:none;
-    font-size:0.82rem;
-    color:var(--muted);
-    margin-top:4px;
-    padding:8px 10px;
-    background:#f6f8f7;
-    border-radius:8px;
-  }
+  .option-btn{ display:block; width:100%; text-align:left; background:#fafcfd; border:1px solid var(--border); padding:9px 12px; border-radius:8px; margin-bottom:7px; font-size:0.87rem; cursor:pointer; color:var(--text); }
+  .option-btn:hover:not(.disabled){ background:#eef3f0; }
+  .option-btn.correct{ background:var(--green-light); border-color:#2e7d32; font-weight:600; }
+  .option-btn.incorrect{ background:var(--red-light); border-color:var(--red); }
+  .option-btn.disabled{ cursor:default; }
+  .single-explain{ display:none; font-size:0.82rem; color:var(--muted); margin-top:4px; padding:8px 10px; background:#f6f8f9; border-radius:8px; }
   .single-explain.show{ display:block; }
   .single-explain b{ color:var(--text); }
-  .icon-ok, .icon-no{
-    font-weight:800;
-    margin-left:4px;
+
+  footer{ text-align:center; font-size:0.75rem; color:var(--muted); padding:20px; }
+
+  /* ===================================================================
+     HIDROLOGIA — namespaced with h- prefix on all interactive classes/ids
+     =================================================================== */
+  .h-topbar{
+    background:linear-gradient(135deg,#0d2c54,#0d47a1 55%,#1565c0);
+    color:#fff; padding:16px 16px 14px;
   }
-  .icon-ok{ color:var(--green); }
-  .icon-no{ color:var(--red); }
-  footer{
-    text-align:center;
-    font-size:0.75rem;
-    color:var(--muted);
-    padding:20px;
+  .h-topbar h2.h-page-title{ margin:0 0 3px; font-size:1.2rem; }
+  .h-topbar p{ margin:0 0 12px; font-size:0.82rem; opacity:0.9; }
+  .h-maintabs{ display:flex; gap:8px; flex-wrap:wrap; }
+  .h-maintab-btn{
+    background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.45);
+    color:#fff; padding:8px 16px; border-radius:20px; font-size:0.88rem; cursor:pointer; font-weight:600;
   }
+  .h-maintab-btn.active{ background:#fff; color:var(--blue); }
+
+  .h-subnav{
+    background:#0a2647; padding:8px 16px; display:flex; gap:6px; flex-wrap:wrap;
+    position:sticky; top:0; z-index:19;
+  }
+  .h-subnav a{ color:#cfe0f5; text-decoration:none; font-size:0.78rem; padding:5px 10px; border-radius:14px; background:rgba(255,255,255,0.08); }
+  .h-subnav a:hover{ background:rgba(255,255,255,0.18); color:#fff; }
+
+  #disc-hidrologia h2.section-title{
+    font-size:1.28rem; color:var(--blue); border-bottom:3px solid var(--blue-light);
+    padding-bottom:8px; margin:32px 0 14px; scroll-margin-top:120px;
+  }
+  #disc-hidrologia h2.section-title:first-child{ margin-top:6px; }
+  #disc-hidrologia h3.sub-title{ color:var(--cyan); }
+  #disc-hidrologia .formula-box{ border-left:4px solid var(--blue2); }
+  #disc-hidrologia .topic-heading{ color:var(--blue); }
+  #disc-hidrologia .h-q-num{ font-weight:700; color:var(--blue2); font-size:0.95rem; }
+  #disc-hidrologia .h-q-points{ background:var(--blue-light); }
+  .h-quiz-tab-btn{ background:#eef3f7; border:1px solid var(--border); color:var(--blue); padding:6px 12px; border-radius:16px; font-size:0.8rem; cursor:pointer; }
+  .h-quiz-tab-btn.active{ background:var(--blue); color:#fff; border-color:var(--blue); }
+  #disc-hidrologia .score-badge{ background:var(--blue-light); }
+  #disc-hidrologia .score-badge b{ color:var(--blue); }
+  .h-reset-btn{ background:var(--blue); color:#fff; border:none; padding:6px 12px; border-radius:16px; font-size:0.78rem; font-weight:600; cursor:pointer; }
+
   @media (max-width:480px){
-    .score-panel{ font-size:0.75rem; gap:8px; }
-    .score-badge{ min-width:56px; padding:5px 8px; }
-    header h1{ font-size:1.05rem; }
+    .h-subnav{ top:0; }
+    #disc-hidrologia h2.section-title{ scroll-margin-top: 150px; }
+  }
+
+  /* ===================================================================
+     OLERICULTURA — original classes kept as-is (already unique vs above)
+     =================================================================== */
+  .o-header{
+    background:linear-gradient(100deg,var(--green) 0%, var(--green-dark) 55%, var(--orange-dark) 100%);
+    color:#fff; padding:16px 16px 14px;
+  }
+  .o-header h2.o-page-title{ margin:0 0 4px; font-size:1.2rem; }
+  .o-header .sub{ font-size:0.85rem; opacity:0.9; }
+  .maintabs{ display:flex; gap:8px; margin-top:14px; flex-wrap:wrap; }
+  .maintab-btn{
+    background:rgba(255,255,255,0.14); border:1px solid rgba(255,255,255,0.35); color:#fff;
+    padding:8px 16px; border-radius:20px; font-size:0.85rem; cursor:pointer; font-weight:600;
+  }
+  .maintab-btn.active{ background:#fff; color:var(--green-dark); }
+
+  .subnav{
+    position:sticky; top:0; z-index:20; background:#fff; border-bottom:1px solid var(--border);
+    display:flex; gap:6px; padding:8px 14px; overflow-x:auto; flex-wrap:wrap;
+  }
+  .subnav a{
+    color:var(--green-dark); text-decoration:none; font-size:0.78rem; padding:5px 10px; border-radius:12px;
+    white-space:nowrap; background:#eef5ee;
+  }
+  .subnav a:hover{ background:var(--green); color:#fff; }
+  .subnav a.cenoura-link{ background:#fdece0; color:var(--orange-dark); }
+  .subnav a.cenoura-link:hover{ background:var(--orange); color:#fff; }
+
+  #disc-olericultura main{ max-width:880px; }
+  .page{ display:none; }
+  .page.active{ display:block; }
+
+  .crop-banner{
+    border-radius:12px; padding:14px 18px; margin:26px 0 14px; color:#fff; font-size:1.15rem; font-weight:700;
+    display:flex; align-items:center; gap:10px;
+  }
+  .crop-banner.alface{ background:linear-gradient(90deg,var(--green),var(--green-dark)); }
+  .crop-banner.cenoura{ background:linear-gradient(90deg,var(--orange),var(--orange-dark)); }
+  .crop-banner:first-child{ margin-top:6px; }
+
+  #disc-olericultura h2.section-title{
+    color:var(--green-dark); border-bottom:2px solid var(--green); padding-bottom:4px; margin-top:26px; font-size:1.1rem;
+    scroll-margin-top:56px;
+  }
+  #disc-olericultura h2.section-title.cenoura-title{ color:var(--orange-dark); border-bottom-color:var(--orange); }
+  #disc-olericultura h3.sub-title{ color:var(--text); font-size:0.98rem; margin-top:18px; margin-bottom:6px; }
+
+  #disc-olericultura .formula-box{ background:#eef5ee; border:1px solid #cfe3cf; }
+  .cenoura-block .formula-box{ background:#fdf1e6; border-color:#f0d3b3; }
+  #disc-olericultura .formula-box .label{ font-weight:600; color:var(--green-dark); margin-bottom:4px; font-size:0.82rem; }
+  .cenoura-block .formula-box .label{ color:var(--orange-dark); }
+
+  #disc-olericultura .example-box{ background:#fff8e1; border:1px solid #ffe082; }
+
+  #disc-olericultura .pitfall-box{ background:#fde8e8; border-left:4px solid #c62828; }
+
+  .qa-tabs{ display:flex; gap:8px; margin:14px 0; flex-wrap:wrap; }
+  .qa-tab-btn{ background:#eef3ee; border:1px solid var(--border); color:var(--green-dark); padding:6px 14px; border-radius:16px; font-size:0.82rem; cursor:pointer; }
+  .qa-tab-btn.active{ background:var(--green); color:#fff; border-color:var(--green); }
+  .qa-card{ background:var(--card); border:1px solid var(--border); border-radius:10px; padding:14px 16px; margin-bottom:12px; }
+  .qa-card.cenoura{ border-left:4px solid var(--orange); }
+  .qa-card.alface{ border-left:4px solid var(--green); }
+  .qa-num{ display:inline-block; background:var(--green); color:#fff; font-size:0.72rem; font-weight:700; padding:2px 9px; border-radius:10px; margin-bottom:6px; }
+  .qa-card.cenoura .qa-num{ background:var(--orange); }
+  .qa-question{ font-weight:600; margin:4px 0 8px; font-size:0.94rem; }
+  .qa-reveal-btn{
+    background:#fff; border:1.5px solid var(--green); color:var(--green-dark); padding:5px 12px; border-radius:14px;
+    font-size:0.78rem; cursor:pointer; font-weight:600;
+  }
+  .qa-card.cenoura .qa-reveal-btn{ border-color:var(--orange); color:var(--orange-dark); }
+  .qa-answer{ display:none; margin-top:10px; padding-top:10px; border-top:1px dashed var(--border); font-size:0.88rem; }
+  .qa-answer.show{ display:block; }
+  .qa-answer ul{ margin:6px 0; padding-left:20px; }
+  .qa-answer li{ margin-bottom:4px; }
+
+  .essay-box{ background:#f4f8f4; border:1px solid var(--border); border-radius:10px; padding:16px 18px; margin-top:14px; font-size:0.9rem; }
+  .essay-box h4{ color:var(--green-dark); margin:14px 0 4px; font-size:0.92rem; }
+  .essay-box h4.c{ color:var(--orange-dark); }
+
+  #disc-olericultura .quiz-tabs .quiz-tab-btn{ background:#eef3ee; border:1px solid var(--border); color:var(--green-dark); padding:6px 12px; border-radius:16px; font-size:0.8rem; cursor:pointer; }
+  #disc-olericultura .quiz-tabs .quiz-tab-btn.active{ background:var(--green); color:#fff; border-color:var(--green); }
+  #disc-olericultura .score-badge{ background:#fff; border:1px solid var(--border); font-size:0.72rem; }
+  #disc-olericultura .score-badge b{ color:var(--green-dark); }
+  #disc-olericultura .reset-btn{ background:var(--orange); color:#fff; border:none; padding:6px 12px; border-radius:14px; font-size:0.78rem; cursor:pointer; font-weight:600; }
+  #disc-olericultura .topic-heading{ color:var(--green-dark); }
+  #disc-olericultura .q-num{ color:var(--green-dark); }
+  #disc-olericultura .q-points{ background:#eef3ee; }
+
+  @media (max-width:600px){
+    .o-header h2.o-page-title{ font-size:1.1rem; }
+    #disc-olericultura h2.section-title{ scroll-margin-top:120px; }
   }
 </style>
 </head>
 <body>
 
-<header>
-  <h1>🌱 Simulado Interativo — Fruticultura</h1>
-  <p>Manga &amp; Banana · 15 questões por cultura · correção instantânea</p>
-  <div class="toolbar">
-    <div class="tabs">
-      <button class="tab-btn active" data-filter="todas">Todas</button>
-      <button class="tab-btn" data-filter="manga">Manga</button>
-      <button class="tab-btn" data-filter="banana">Banana</button>
+<div class="top-header">
+  <h1>📚 Central de Revisão — Provas</h1>
+  <div class="disc-switch">
+    <button class="disc-btn active" data-disc="hidrologia">🌊 Hidrologia Agrícola</button>
+    <button class="disc-btn" data-disc="olericultura">🥬🥕 Olericultura</button>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- ======================  HIDROLOGIA  ========================= -->
+<!-- ============================================================ -->
+<div id="disc-hidrologia" class="discipline active">
+
+<div class="h-topbar">
+  <h2 class="h-page-title">💧 Hidrologia Agrícola — Revisão &amp; Simulado</h2>
+  <p>Conteúdo da 1ª VA: Introdução, Ciclo Hidrológico, Impactos e Bacia Hidrográfica</p>
+  <div class="h-maintabs">
+    <button class="h-maintab-btn active" data-page="revisao">📘 Revisão</button>
+    <button class="h-maintab-btn" data-page="simulado">📝 Simulado</button>
+  </div>
+</div>
+
+<div class="h-subnav" id="h-subnav">
+  <a href="#h-intro">Introdução</a>
+  <a href="#h-ciclo">Ciclo Hidrológico</a>
+  <a href="#h-impactos">Impactos</a>
+  <a href="#h-bacia">Bacia Hidrográfica</a>
+  <a href="#h-pegada">Pegada Hídrica</a>
+  <a href="#h-pegadinhas">Pegadinhas</a>
+</div>
+
+<main>
+
+<!-- ================= REVISÃO ================= -->
+<section class="h-page active" id="h-page-revisao">
+
+  <h2 class="section-title" id="h-intro">1. Introdução à Hidrologia</h2>
+  <div class="card">
+    <p>Hidrologia é a ciência que estuda a ocorrência, circulação, distribuição e propriedades da água na Terra, incluindo sua interação com o ambiente e os seres vivos. Na Agronomia, a <b>hidrologia agrícola</b> aplica esses princípios à gestão racional e sustentável dos recursos hídricos usados na produção (irrigação, drenagem, conservação de solo e água, dimensionamento de reservatórios/barragens rurais).</p>
+    <p>Na prática, os estudos hidrológicos quase sempre adotam a <b>bacia hidrográfica</b> como unidade de análise, pois ela oferece um sistema fechado e conveniente para aplicar a equação do balanço hídrico (entradas = saídas ± variação de armazenamento).</p>
+  </div>
+
+  <h2 class="section-title" id="h-ciclo">2. Ciclo Hidrológico (Ciclo da Água)</h2>
+  <div class="card">
+    <p>É o processo contínuo de circulação da água entre atmosfera, superfície terrestre e subsolo. É movido por <b>duas forças</b>: a energia solar (provoca a evaporação) e a gravidade (faz a água precipitada escoar/infiltrar).</p>
+
+    <div class="diagram-box">
+      <svg viewBox="0 0 640 300" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="60" cy="45" r="26" fill="#f9a825"/>
+        <g stroke="#f9a825" stroke-width="3">
+          <line x1="60" y1="8" x2="60" y2="-4"/>
+          <line x1="90" y1="20" x2="100" y2="10"/>
+          <line x1="30" y1="20" x2="20" y2="10"/>
+        </g>
+        <ellipse cx="230" cy="60" rx="55" ry="26" fill="#cfe0f0"/>
+        <ellipse cx="270" cy="50" rx="40" ry="20" fill="#cfe0f0"/>
+        <ellipse cx="190" cy="52" rx="35" ry="18" fill="#cfe0f0"/>
+        <text x="230" y="65" font-size="12" text-anchor="middle" fill="#274a6b">nuvem (condensação)</text>
+
+        <polygon points="330,260 430,90 530,260" fill="#8d9c8a"/>
+        <polygon points="400,150 430,90 460,150" fill="#eef3ee"/>
+        <text x="430" y="110" font-size="11" text-anchor="middle" fill="#334">serra</text>
+
+        <rect x="0" y="260" width="640" height="40" fill="#5b8fc9"/>
+        <text x="80" y="285" font-size="12" fill="#fff">oceano / rio</text>
+
+        <!-- evaporação -->
+        <path d="M100,255 C110,180 140,120 190,75" stroke="#1565c0" stroke-width="2.5" fill="none" marker-end="url(#arrowH)"/>
+        <text x="70" y="180" font-size="11" fill="#1565c0" transform="rotate(-60 70 180)">evaporação</text>
+
+        <!-- precipitação -->
+        <path d="M250,90 C245,140 240,190 235,255" stroke="#0d47a1" stroke-width="2.5" fill="none" marker-end="url(#arrowH)"/>
+        <text x="255" y="180" font-size="11" fill="#0d47a1">precipitação</text>
+
+        <!-- escoamento superficial -->
+        <path d="M430,160 C420,200 350,240 260,258" stroke="#00838f" stroke-width="2.5" fill="none" marker-end="url(#arrowH)"/>
+        <text x="330" y="230" font-size="11" fill="#00838f">escoamento superficial</text>
+
+        <!-- infiltração -->
+        <path d="M470,262 C475,278 475,290 470,298" stroke="#6d4c1c" stroke-width="2.5" fill="none" marker-end="url(#arrowH)"/>
+        <text x="440" y="296" font-size="11" fill="#6d4c1c">infiltração</text>
+
+        <defs>
+          <marker id="arrowH" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+            <path d="M0,0 L8,4 L0,8 z" fill="context-stroke"/>
+          </marker>
+        </defs>
+      </svg>
+      <div class="diagram-caption">Esquema simplificado do ciclo hidrológico: evaporação → condensação → precipitação → escoamento/infiltração.</div>
+    </div>
+
+    <h3 class="sub-title">Fases principais</h3>
+    <ul>
+      <li><b>Evaporação</b>: água líquida (oceanos, rios, solo) passa a vapor pela ação do calor solar.</li>
+      <li><b>Evapotranspiração</b>: soma da evaporação do solo com a transpiração das plantas.</li>
+      <li><b>Condensação</b>: vapor d'água esfria na atmosfera e forma nuvens.</li>
+      <li><b>Precipitação</b>: água condensada retorna à superfície (chuva, granizo, orvalho, neve).</li>
+      <li><b>Interceptação</b>: parte da chuva fica retida na vegetação antes de atingir o solo.</li>
+      <li><b>Infiltração</b>: água penetra no solo.</li>
+      <li><b>Percolação</b>: água infiltrada continua descendo até o lençol freático, recarregando aquíferos.</li>
+      <li><b>Escoamento superficial (runoff)</b>: parcela da chuva que não infiltra e escoa sobre o terreno até os cursos d'água.</li>
+      <li><b>Escoamento de base</b>: contribuição da água subterrânea que mantém os rios perenes na estiagem.</li>
+    </ul>
+
+    <div class="formula-box">
+      <div class="label">Princípio geral (qualquer sistema): Entrada − Saída = variação do armazenamento</div>
+      <div class="eq">ΔS&nbsp;=&nbsp;E&nbsp;−&nbsp;S</div>
+      <div class="desc">ΔS = variação do armazenamento · E = entradas de água no sistema · S = saídas de água do sistema</div>
+    </div>
+    <div class="formula-box">
+      <div class="label">Aplicado à bacia hidrográfica (P = entrada; ET + Q = saídas)</div>
+      <div class="eq">ΔS&nbsp;=&nbsp;P&nbsp;−&nbsp;(ET&nbsp;+&nbsp;Q)</div>
+      <div class="desc">P = precipitação · ET = evapotranspiração · Q = deflúvio/vazão de saída (escoamento) · ΔS = variação do armazenamento (solo + subsolo). Equivale a P = ET + Q + ΔS.</div>
+    </div>
+  </div>
+
+  <h2 class="section-title" id="h-impactos">3. Impactos sobre os Recursos Naturais/Hídricos</h2>
+  <div class="card">
+    <ul>
+      <li><b>Desmatamento</b>: reduz interceptação e infiltração, aumenta o escoamento superficial, acelera erosão e assoreamento dos cursos d'água, altera o microclima local e reduz a recarga de aquíferos.</li>
+      <li><b>Urbanização</b>: impermeabiliza o solo (asfalto/concreto), o que também aumenta drasticamente o escoamento superficial e reduz a infiltração — resultado: picos de vazão mais altos e mais rápidos (menor tempo de concentração), maior risco de enchentes.</li>
+      <li><b>Erosão e assoreamento</b>: solo desprotegido (desmatado ou mal manejado) é carreado para os cursos d'água, elevando o leito do rio (assoreamento), reduzindo sua capacidade de vazão e favorecendo transbordamentos.</li>
+      <li><b>Poluição</b>: lançamento de esgoto doméstico/industrial e agrotóxicos causa contaminação química/bacteriológica e <b>eutrofização</b> (excesso de nutrientes, geralmente N e P, que causa proliferação de algas e reduz o oxigênio dissolvido).</li>
+    </ul>
+    <div class="example-box">
+      <div class="label">Encadeamento causal típico de prova</div>
+      Desmatamento/urbanização → menos infiltração/interceptação → mais escoamento superficial → menor tempo de concentração → picos de vazão maiores → mais erosão e assoreamento → mais risco de enchente.
+    </div>
+  </div>
+
+  <h2 class="section-title" id="h-bacia">4. Bacia Hidrográfica</h2>
+
+  <h3 class="sub-title">4.1 Definição e divisores</h3>
+  <div class="card">
+    <p>Bacia hidrográfica é a área definida topograficamente, drenada por um curso d'água ou sistema de cursos d'água conectados, de modo que toda a vazão efluente seja descarregada por uma única seção de saída (<b>exutória</b>/foz).</p>
+
+    <div class="diagram-box">
+      <svg viewBox="0 0 500 260" xmlns="http://www.w3.org/2000/svg">
+        <path d="M60,60 C120,20 220,15 300,35 C380,55 440,90 450,150 C460,205 400,235 320,230 C240,225 180,230 120,210 C60,190 30,150 40,110 C45,85 45,75 60,60 Z"
+              fill="#eaf3fb" stroke="#0d47a1" stroke-width="2.5" stroke-dasharray="6,3"/>
+        <text x="255" y="45" font-size="11" fill="#0d47a1" text-anchor="middle">divisor topográfico (linha de cumeada)</text>
+
+        <path d="M250,70 C245,100 240,120 230,140" stroke="#1976d2" stroke-width="2"/>
+        <path d="M180,90 C200,110 215,125 230,140" stroke="#1976d2" stroke-width="2"/>
+        <path d="M320,80 C300,105 260,125 230,140" stroke="#1976d2" stroke-width="2"/>
+        <path d="M230,140 C240,165 250,185 262,205" stroke="#0d47a1" stroke-width="3.5"/>
+        <circle cx="262" cy="205" r="5" fill="#c62828"/>
+        <text x="290" y="212" font-size="11" fill="#c62828">exutória (foz)</text>
+      </svg>
+      <div class="diagram-caption">Bacia hidrográfica: contorno = divisor topográfico; linhas internas = rede de drenagem convergindo para a exutória.</div>
+    </div>
+
+    <p>Existem <b>dois divisores de água</b>:</p>
+    <ul>
+      <li><b>Divisor topográfico</b>: linha de cumeada (pontos de cota máxima); define os limites do escoamento superficial direto.</li>
+      <li><b>Divisor freático (subterrâneo)</b>: determinado pela estrutura geológica; delimita o reservatório de água subterrânea, de onde vem o escoamento de base.</li>
+    </ul>
+    <p>Quando os dois divisores não coincidem, ocorrem "fugas" de água entre bacias vizinhas — na prática, isso é desprezado nos cálculos do balanço hídrico, pois tende a se compensar.</p>
+  </div>
+
+  <h3 class="sub-title">4.2 Área de drenagem (A)</h3>
+  <div class="card">
+    <p>Área plana (projetada) delimitada pelo divisor topográfico. Obtida por planimetria no mapa topográfico, após traçar o contorno da bacia. É a base de cálculo de quase todos os outros parâmetros morfométricos.</p>
+  </div>
+
+  <h3 class="sub-title">4.3 Coeficiente de compacidade (Kc)</h3>
+  <div class="card">
+    <p>Relaciona o perímetro da bacia (P) com o perímetro de um círculo de área igual à da bacia (A):</p>
+    <div class="formula-box">
+      <div class="eq">K<sub>c</sub>&nbsp;≈&nbsp;0,28&nbsp;×&nbsp;<span class="frac"><span class="num">P</span><span class="den">√A</span></span></div>
+      <div class="desc">P em km, A em km² — Kc é adimensional</div>
+    </div>
+    <ul>
+      <li>Kc é sempre <b>≥ 1</b> (o círculo é a forma de menor perímetro para uma dada área).</li>
+      <li>Quanto <b>mais próximo de 1</b>, mais a bacia se assemelha a um círculo → tende a concentrar o escoamento → <b>mais suscetível a enchentes</b>.</li>
+    </ul>
+    <div class="example-box">
+      <div class="label">Exemplo resolvido — bacia do rio do Carmo (MG)</div>
+      A = 2.280 km², P = 319 km<br>
+      Kc ≈ 0,28 × 319 / √2280 = 0,28 × 319 / 47,7 ≈ <b>1,87</b> (índice relativamente alto, mas ainda distante de 1)
+    </div>
+  </div>
+
+  <h3 class="sub-title">4.4 Fator de forma (Kf)</h3>
+  <div class="card">
+    <p>Relaciona a largura média da bacia (l = A/L) com o comprimento axial (L, medido do exutório até o ponto mais remoto do divisor):</p>
+    <div class="formula-box">
+      <div class="eq">K<sub>f</sub>&nbsp;=&nbsp;<span class="frac"><span class="num">A</span><span class="den">L²</span></span></div>
+    </div>
+    <p>Bacias alongadas (Kf pequeno) são <b>menos suscetíveis a enchentes</b>, pois é menos provável que uma chuva intensa cubra toda a extensão da bacia ao mesmo tempo.</p>
+    <div class="example-box">
+      <div class="label">Exemplo resolvido — mesma bacia do rio do Carmo</div>
+      L = 132,3 km, largura média = 17,2 km<br>
+      Kf = 17,2 / 132,3 ≈ <b>0,13</b> (bacia alongada, pouco propensa a inundação — coerente com o Kc não crítico)
+    </div>
+  </div>
+
+  <h3 class="sub-title">4.5 Densidade de drenagem (Dd)</h3>
+  <div class="card">
+    <p>Mede o grau de desenvolvimento da rede de drenagem:</p>
+    <div class="formula-box">
+      <div class="eq">D<sub>d</sub>&nbsp;=&nbsp;<span class="frac"><span class="num">ΣL<sub>i</sub></span><span class="den">A</span></span></div>
+      <div class="desc">ΣLᵢ = soma dos comprimentos de todos os cursos d'água (km) · A = área da bacia (km²)</div>
+    </div>
+    <p>Varia tipicamente entre <b>0,5 km⁻¹</b> (drenagem pobre) e <b>3,5 km⁻¹</b> (bacia excepcionalmente bem drenada). Depende muito da escala do mapa usado — sempre declarar a escala junto com o valor.</p>
+    <p>Existe também a <b>densidade de rios (Dr)</b> — não confundir com Dd: usa o <b>número</b> de canais, não o comprimento:</p>
+    <div class="formula-box">
+      <div class="eq">D<sub>r</sub>&nbsp;=&nbsp;<span class="frac"><span class="num">N</span><span class="den">A</span></span></div>
+      <div class="desc">N = número total de canais (segmentos de rio) · A = área da bacia (km²) · Dr em km⁻²</div>
+    </div>
+    <p>Melton (1958) propôs uma relação empírica entre as duas densidades: <b>Dr ≈ 0,694 × Dd</b>.</p>
+  </div>
+
+  <h3 class="sub-title">4.6 Ordem dos cursos d'água (Horton-Strahler)</h3>
+  <div class="card">
+    <ol>
+      <li>Canais sem tributários (nascentes) = <b>ordem 1</b>.</li>
+      <li>Encontro de dois canais de <b>mesma</b> ordem → ordem do canal resultante sobe <b>uma unidade</b>.</li>
+      <li>Encontro de canais de ordens <b>diferentes</b> → o canal resultante mantém a <b>maior</b> das duas ordens (não soma).</li>
+    </ol>
+
+    <div class="diagram-box">
+      <svg viewBox="0 0 420 220" xmlns="http://www.w3.org/2000/svg">
+        <line x1="40" y1="30" x2="110" y2="90" stroke="#1976d2" stroke-width="2"/>
+        <text x="30" y="25" font-size="12" fill="#0d47a1">1</text>
+        <line x1="80" y1="20" x2="110" y2="90" stroke="#1976d2" stroke-width="2"/>
+        <text x="80" y="15" font-size="12" fill="#0d47a1">1</text>
+        <line x1="110" y1="90" x2="180" y2="120" stroke="#1565c0" stroke-width="3"/>
+        <text x="130" y="95" font-size="12" fill="#1565c0">2</text>
+
+        <line x1="150" y1="40" x2="220" y2="100" stroke="#1976d2" stroke-width="2"/>
+        <text x="145" y="35" font-size="12" fill="#0d47a1">1</text>
+        <line x1="200" y1="45" x2="220" y2="100" stroke="#1976d2" stroke-width="2"/>
+        <text x="205" y="40" font-size="12" fill="#0d47a1">1</text>
+        <line x1="220" y1="100" x2="180" y2="120" stroke="#1565c0" stroke-width="3"/>
+        <text x="225" y="105" font-size="12" fill="#1565c0">2</text>
+
+        <line x1="180" y1="120" x2="260" y2="160" stroke="#0d47a1" stroke-width="4"/>
+        <text x="205" y="135" font-size="13" fill="#0d47a1" font-weight="bold">3</text>
+
+        <line x1="300" y1="90" x2="260" y2="160" stroke="#1976d2" stroke-width="2"/>
+        <text x="295" y="85" font-size="12" fill="#0d47a1">1</text>
+
+        <line x1="260" y1="160" x2="330" y2="195" stroke="#0d47a1" stroke-width="4"/>
+        <text x="275" y="180" font-size="13" fill="#0d47a1" font-weight="bold">3</text>
+        <circle cx="330" cy="195" r="4" fill="#c62828"/>
+        <text x="340" y="200" font-size="11" fill="#c62828">foz</text>
+      </svg>
+      <div class="diagram-caption">Exemplo: dois pares de canais de ordem 1 formam canais de ordem 2; a junção dos dois de ordem 2 sobe para ordem 3; o encontro seguinte com um canal de ordem 1 mantém a ordem 3 (maior das duas).</div>
+    </div>
+    <p>A ordem do curso principal reflete o grau de ramificação/desenvolvimento do sistema de drenagem.</p>
+  </div>
+
+  <h3 class="sub-title">4.7 Declividade da bacia</h3>
+  <div class="card">
+    <p>Obtida por amostragem estatística (<b>método das quadrículas associadas a um vetor</b>): sobrepõe-se uma malha ao mapa, traçam-se vetores perpendiculares às curvas de nível nos pontos de interseção, e calcula-se a declividade pontual:</p>
+    <div class="formula-box">
+      <div class="eq">d<sub>i</sub>&nbsp;=&nbsp;<span class="frac"><span class="num">Δz</span><span class="den">Δx<sub>i</sub></span></span></div>
+    </div>
+    <p>Com os valores pontuais monta-se uma distribuição de frequências, obtendo a declividade <b>média</b> e <b>mediana</b> da bacia. Importa porque: quanto maior a declividade, maior a velocidade de escoamento, menor o tempo de concentração, maior o pico de vazão e maior o risco de erosão.</p>
+    <div class="example-box">
+      <div class="label">Exemplo resolvido — bacia do rio Capivari (417 pontos amostrados)</div>
+      Declividade mediana ≈ 0,084 (8,4%) · Declividade média ≈ <b>0,113</b> (11,3%), calculada como <span class="eq" style="display:inline-flex;font-size:1em;">d̄&nbsp;=&nbsp;Σ(f<sub>i</sub>&nbsp;×&nbsp;d̄<sub>i</sub>)</span>, ponderando cada intervalo de classe pela sua frequência relativa.
+    </div>
+  </div>
+
+  <h3 class="sub-title">4.8 Declividade do curso d'água principal</h3>
+  <div class="card">
+    <div class="diagram-box">
+      <svg viewBox="0 0 460 200" xmlns="http://www.w3.org/2000/svg">
+        <line x1="40" y1="170" x2="440" y2="170" stroke="#888" stroke-width="1.5"/>
+        <line x1="40" y1="170" x2="40" y2="20" stroke="#888" stroke-width="1.5"/>
+        <text x="10" y="30" font-size="10" fill="#555">cota</text>
+        <text x="410" y="188" font-size="10" fill="#555">distância</text>
+
+        <path d="M50,40 C120,55 160,90 210,110 C260,128 300,140 340,150 C380,158 410,163 430,166"
+              fill="none" stroke="#0d47a1" stroke-width="2.5"/>
+        <text x="55" y="35" font-size="10" fill="#0d47a1">cabeceira</text>
+        <text x="395" y="180" font-size="10" fill="#0d47a1">foz</text>
+
+        <line x1="50" y1="40" x2="430" y2="166" stroke="#c62828" stroke-width="1.8" stroke-dasharray="5,4"/>
+        <text x="220" y="95" font-size="10" fill="#c62828">linha S1 (declividade entre extremos)</text>
+      </svg>
+      <div class="diagram-caption">Perfil longitudinal do rio (curva azul, real) vs. linha reta S1 entre extremos (vermelha, tracejada).</div>
+    </div>
+
+    <div class="formula-box">
+      <div class="label">Declividade entre extremos (S1)</div>
+      <div class="eq">S<sub>1</sub>&nbsp;=&nbsp;<span class="frac"><span class="num">z<sub>cabeceira</sub>&nbsp;−&nbsp;z<sub>foz</sub></span><span class="den">L</span></span></div>
+    </div>
+    <div class="formula-box">
+      <div class="label">Declividade S10-85</div>
+      <div class="eq">S<sub>10-85</sub>&nbsp;=&nbsp;<span class="frac"><span class="num">z<sub>85%</sub>&nbsp;−&nbsp;z<sub>10%</sub></span><span class="den">0,75&nbsp;×&nbsp;L</span></span></div>
+      <div class="desc">Usa as cotas a 10% e 85% do comprimento do rio (medido a partir da foz) — evita distorção por trechos muito íngremes perto da nascente.</div>
+    </div>
+    <p><b>Declividade média (S2)</b>: obtida graficamente, traçando uma reta no perfil longitudinal tal que a área abaixo dela seja igual à área abaixo da curva real do perfil.</p>
+    <p><b>Declividade equivalente constante (S3)</b>: aquela que faria a água percorrer um canal hipotético no mesmo tempo total que leva no canal natural real (considera múltiplos trechos com declividades diferentes, via equação de Chèzy).</p>
+  </div>
+
+  <h3 class="sub-title">4.9 Curva hipsométrica</h3>
+  <div class="card">
+    <p>Representa graficamente o relevo da bacia: eixo vertical = cotas (altitude), eixo horizontal = % da área acumulada acima (ou abaixo) de cada cota.</p>
+
+    <div class="diagram-box">
+      <svg viewBox="0 0 420 220" xmlns="http://www.w3.org/2000/svg">
+        <line x1="50" y1="190" x2="400" y2="190" stroke="#888" stroke-width="1.5"/>
+        <line x1="50" y1="190" x2="50" y2="20" stroke="#888" stroke-width="1.5"/>
+        <text x="200" y="210" font-size="10" fill="#555" text-anchor="middle">área relativa acumulada (%)</text>
+        <text x="15" y="105" font-size="10" fill="#555" transform="rotate(-90 15 105)">cota (m)</text>
+
+        <path d="M55,35 C90,55 130,90 170,115 C220,140 280,160 395,183"
+              fill="none" stroke="#0d47a1" stroke-width="2.5"/>
+        <line x1="50" y1="115" x2="225" y2="115" stroke="#2e7d32" stroke-width="1.3" stroke-dasharray="4,3"/>
+        <line x1="225" y1="115" x2="225" y2="190" stroke="#2e7d32" stroke-width="1.3" stroke-dasharray="4,3"/>
+        <text x="230" y="112" font-size="10" fill="#2e7d32">50% → cota mediana</text>
+      </svg>
+      <div class="diagram-caption">Curva hipsométrica típica (convexa): forma decrescente da cota em função da área acumulada.</div>
+    </div>
+
+    <p>Construção: planimetrar as áreas entre curvas de nível consecutivas → calcular área relativa e acumulada → plotar cota × área relativa acumulada.</p>
+    <div class="formula-box">
+      <div class="label">Altitude média</div>
+      <div class="eq">z̄&nbsp;=&nbsp;<span class="frac"><span class="num">1</span><span class="den">A</span></span>&nbsp;×&nbsp;Σ(A<sub>i</sub>&nbsp;×&nbsp;z̄<sub>i</sub>)</div>
+      <div class="desc">Aᵢ = área entre duas curvas de nível consecutivas · z̄ᵢ = cota média desse intervalo</div>
+    </div>
+    <p>A <b>altitude mediana</b> é a cota correspondente a 50% da área acumulada (lida diretamente no gráfico).</p>
+    <div class="example-box">
+      <div class="label">Exemplo resolvido — bacia do rio Capivari</div>
+      Altitude mediana ≈ 840 m · Altitude média ≈ <b>816,5 m</b>
+    </div>
+  </div>
+
+  <h3 class="sub-title">4.10 Retângulo equivalente</h3>
+  <div class="card">
+    <p>Transformação geométrica da bacia real num retângulo de <b>mesma área</b>, <b>mesmo perímetro</b> e <b>mesmo coeficiente de compacidade (Kc)</b> — usado para comparar bacias de formas diferentes e representar a hipsometria de forma padronizada (as curvas de nível viram retas paralelas ao lado menor do retângulo).</p>
+  </div>
+
+  <h3 class="sub-title">4.11 Diagnóstico Físico-Conservacionista (DFC)</h3>
+  <div class="card">
+    <p>Metodologia (Rocha) que usa os parâmetros morfométricos — coeficiente de compacidade (Kc), fator de forma (Kf), índice de circularidade (Ic), densidade de drenagem (Dd), declividade média (Dm) e coeficiente de rugosidade (Rn = Dd × Dm) — para diagnosticar o grau de proteção/degradação da cobertura vegetal e do solo da bacia, comparando a vegetação atual com a original.</p>
+    <p>É a base para avaliar a <b>aptidão de uso da terra</b> e orientar o manejo conservacionista/manejo integrado de bacias hidrográficas.</p>
+  </div>
+
+  <h3 class="sub-title">4.12 Relações complementares (Leis de Horton e Lei de Hack)</h3>
+  <div class="card">
+    <p>Horton (1945) estabeleceu quatro leis empíricas relacionando as ordens dos canais (Horton-Strahler) — todas geram uma taxa que tende a ser <b>constante</b> dentro de uma mesma bacia:</p>
+    <ul>
+      <li><b>Taxa de bifurcação (Rb)</b>: razão entre o número de canais de uma ordem e o da ordem seguinte. Varia normalmente entre <b>2 e 5</b>.</li>
+      <li><b>Taxa de comprimento (Rl)</b>: razão entre o comprimento médio dos canais de uma ordem e da ordem anterior. Varia entre <b>1,5 e 3,5</b>.</li>
+      <li><b>Taxa de declividade (Rs)</b>: razão entre a declividade média dos canais de uma ordem e da ordem seguinte.</li>
+      <li><b>Taxa de área (RA)</b>: razão entre a área média das bacias de uma ordem e da ordem anterior. Varia entre <b>3 e 6</b>.</li>
+    </ul>
+    <p><b>Lei de Hack</b> (1957): relação empírica entre comprimento do rio principal (L) e área da bacia (A):</p>
+    <div class="formula-box">
+      <div class="eq">L&nbsp;=&nbsp;1,5&nbsp;×&nbsp;A<sup>0,6</sup></div>
+      <div class="desc">L em km, A em km². Mostra que a bacia tende a ficar mais alongada (não apenas maior) à medida que cresce — por isso o expoente não é 0,5.</div>
+    </div>
+  </div>
+
+  <h2 class="section-title" id="h-pegada">5. Pegada Hídrica (Água Azul, Verde e Cinza)</h2>
+  <div class="card">
+    <p>A <b>pegada hídrica</b> (water footprint, conceito de Hoekstra, 2003) mede o volume total de água doce, direto e indireto, usado para produzir um bem, serviço, ou consumido por uma pessoa/país. Inclui o consumo <b>visível</b> (torneira) e o <b>invisível/embutido</b> nos produtos (ex.: ~15.500 L de água para produzir 1 kg de carne bovina).</p>
+    <p>Divide-se em três componentes:</p>
+    <ul>
+      <li><b>Água azul</b>: água doce de rios, lagos e aquíferos (superficial + subterrânea) efetivamente retirada/consumida — usada em irrigação, indústria, abastecimento.</li>
+      <li><b>Água verde</b>: água da chuva armazenada no solo (não infiltra até o lençol nem escoa) e que fica disponível para as plantas — é o principal componente na agricultura de sequeiro.</li>
+      <li><b>Água cinza</b>: volume de água necessário para <b>diluir</b> a carga de poluentes lançada até que a água volte a atender aos padrões de qualidade ambiental.</li>
+    </ul>
+    <div class="formula-box">
+      <div class="label">Pegada hídrica total</div>
+      <div class="eq">PH<sub>total</sub>&nbsp;=&nbsp;PH<sub>azul</sub>&nbsp;+&nbsp;PH<sub>verde</sub>&nbsp;+&nbsp;PH<sub>cinza</sub></div>
+    </div>
+    <div class="formula-box">
+      <div class="label">Pegada hídrica cinza</div>
+      <div class="eq">PH<sub>cinza</sub>&nbsp;=&nbsp;<span class="frac"><span class="num">L</span><span class="den">C<sub>max</sub>&nbsp;−&nbsp;C<sub>nat</sub></span></span></div>
+      <div class="desc">L = carga do poluente lançado · C<sub>max</sub> = concentração máxima permitida pela legislação · C<sub>nat</sub> = concentração natural do poluente no corpo hídrico (sem interferência humana)</div>
+    </div>
+    <p>Conceito relacionado: <b>água virtual</b> — o volume de água "embutido" no comércio de um produto entre regiões/países (ex.: o Brasil é exportador líquido de água virtual através do agronegócio).</p>
+  </div>
+
+  <h2 class="section-title" id="h-pegadinhas">6. Pegadinhas Comuns</h2>
+  <div class="pitfall-box">
+    <b>Kc x Kf:</b> Kc perto de <b>1</b> → mais redondo → <b>mais</b> enchente. Kf <b>pequeno</b> → mais alongado → <b>menos</b> enchente. Não confundir a lógica de cada um.
+  </div>
+  <div class="pitfall-box">
+    <b>Divisores:</b> divisor <b>topográfico</b> (superficial, define área de escoamento direto) ≠ divisor <b>freático</b> (subterrâneo, define reservatório de água subterrânea).
+  </div>
+  <div class="pitfall-box">
+    <b>Densidade de drenagem:</b> sempre depende da <b>escala do mapa</b> usado — um valor isolado sem a escala não permite comparação confiável.
+  </div>
+  <div class="pitfall-box">
+    <b>Horton-Strahler:</b> ordens <b>iguais</b> se encontrando → sobe um nível. Ordens <b>diferentes</b> se encontrando → fica com a maior (não soma, não sobe).
+  </div>
+  <div class="pitfall-box">
+    <b>Declividade da bacia x do rio:</b> declividade da <b>bacia</b> vem de amostragem em toda a área (quadrículas + vetor); declividade do <b>rio principal</b> vem do perfil longitudinal do curso d'água.
+  </div>
+  <div class="pitfall-box">
+    <b>Dr x Dd:</b> densidade de <b>rios</b> (Dr) usa o <b>número</b> de canais; densidade de <b>drenagem</b> (Dd) usa o <b>comprimento</b> total dos canais. Não são a mesma coisa, mas se relacionam por Dr ≈ 0,694 × Dd.
+  </div>
+  <div class="pitfall-box">
+    <b>Pegada hídrica azul x verde x cinza:</b> azul = água <b>retirada</b> de rios/aquíferos; verde = água da <b>chuva</b> usada pelas plantas (não é "retirada" de manancial); cinza = água necessária para <b>diluir poluição</b>, não é água efetivamente consumida.
+  </div>
+
+</section>
+
+<!-- ================= SIMULADO ================= -->
+<section class="h-page" id="h-page-simulado">
+  <div class="quiz-toolbar">
+    <div class="quiz-tabs">
+      <button class="h-quiz-tab-btn active" data-filter="todas">Todas</button>
+      <button class="h-quiz-tab-btn" data-filter="ciclo">Ciclo &amp; Água</button>
+      <button class="h-quiz-tab-btn" data-filter="impactos">Impactos</button>
+      <button class="h-quiz-tab-btn" data-filter="bacia">Bacia Hidrográfica</button>
+      <button class="h-quiz-tab-btn" data-filter="pegada">Pegada Hídrica</button>
+    </div>
+    <div class="score-panel">
+      <div class="score-badge">Acertos<br><b id="h-scoreCorrect">0</b></div>
+      <div class="score-badge">Resp.<br><b id="h-scoreAnswered">0</b></div>
+      <div class="score-badge">Total<br><b id="h-scoreTotal">0</b></div>
+      <button class="h-reset-btn" id="h-resetBtn">Reiniciar</button>
+    </div>
+  </div>
+  <div id="h-quizContainer"></div>
+</section>
+
+</main>
+
+</div>
+<!-- ============== fim HIDROLOGIA ============== -->
+
+<!-- ============================================================ -->
+<!-- ======================  OLERICULTURA  ======================= -->
+<!-- ============================================================ -->
+<div id="disc-olericultura" class="discipline">
+
+<div class="o-header">
+  <h2 class="o-page-title">🥬🥕 Olericultura — Alface &amp; Cenoura</h2>
+  <div class="sub">Revisão técnica, questões dissertativas e simulado interativo — conteúdo de cada cultura mantido separado</div>
+  <div class="maintabs">
+    <button class="maintab-btn active" data-page="revisao">📖 Revisão</button>
+    <button class="maintab-btn" data-page="dissertativas">✍️ Dissertativas</button>
+    <button class="maintab-btn" data-page="simulado">✅ Simulado</button>
+  </div>
+</div>
+
+<div class="subnav" id="subnav">
+  <a href="#alf-intro">Alface: Botânica/Clima</a>
+  <a href="#alf-germinacao">Alface: Germinação</a>
+  <a href="#alf-nutricao">Alface: Nutrição</a>
+  <a href="#alf-disturbios">Alface: Distúrbios</a>
+  <a href="#alf-poscolheita">Alface: Pós-colheita</a>
+  <a href="#cen-intro" class="cenoura-link">Cenoura: Botânica/Clima</a>
+  <a href="#cen-cultivares" class="cenoura-link">Cenoura: Cultivares</a>
+  <a href="#cen-solo" class="cenoura-link">Cenoura: Solo/Adubação</a>
+  <a href="#cen-doencas" class="cenoura-link">Cenoura: Doenças</a>
+</div>
+
+<main>
+
+<!-- ================= REVISÃO ================= -->
+<section class="page active" id="page-revisao">
+
+  <div class="crop-banner alface">🥬 ALFACE (Lactuca sativa)</div>
+
+  <h2 class="section-title" id="alf-intro">1. Botânica, Clima e Ciclo</h2>
+  <div class="card alface-block">
+    <p>Pertence à família <b>Asteraceae</b> (gênero <i>Lactuca</i>, mais de 100 espécies), originária de regiões de clima <b>temperado</b> (sul da Europa/Ásia Ocidental). Planta herbácea, caule diminuto, folhas em roseta. Baixíssima taxa de polinização cruzada (~1%) — pólen pegajoso, poucos insetos eficientes — predominando autofecundação/cleistogamia.</p>
+    <p>É pouco tolerante a temperaturas elevadas: acima de <b>20 °C</b> já estimula o <b>pendoamento</b> (florescimento precoce), efeito acentuado conforme a temperatura sobe; dias longos + calor aceleram ainda mais o processo. Em condições de estresse térmico a planta reduz ciclo e número de folhas, comprometendo a produção.</p>
+    <p>Época de plantio no Brasil: <b>outono/inverno</b> (abril–agosto, temperaturas amenas, fotoperíodo curto) e <b>primavera/verão</b> (setembro–fevereiro, temperaturas altas, fotoperíodo longo — maior risco de pendoamento e queda de qualidade).</p>
+  </div>
+
+  <h2 class="section-title" id="alf-germinacao">2. Germinação de Sementes: Termoinibição, Termodormência e Fitocromo</h2>
+  <div class="card alface-block">
+    <p>Temperatura ótima de germinação: <b>~20 °C</b>. A maioria das cultivares perde a capacidade de germinar acima de <b>30 °C</b>. Sob altas temperaturas durante a embebição, dois fenômenos distintos podem ocorrer:</p>
+    <ul>
+      <li><b>Termoinibição</b>: processo <b>reversível</b> — a semente não germina no calor, mas volta a germinar normalmente assim que a temperatura retorna a um nível adequado (15–22 °C). Está associada à restrição imposta pelo pericarpo e ao reduzido potencial de crescimento do embrião (o eixo embrionário não gera força suficiente para romper o pericarpo no calor).</li>
+      <li><b>Termodormência</b> (dormência secundária): as sementes <b>não germinam mesmo depois</b> de a temperatura ser reduzida — o estado de inibição se torna persistente.</li>
+    </ul>
+    <div class="example-box">
+      <div class="label">Qual fenômeno costuma ocorrer?</div>
+      Na maioria dos relatos de campo/laboratório com exposição a calor durante a embebição, o mais comum é a <b>termoinibição</b> (reversível). A termodormência é o quadro mais severo, quando a exposição ao calor é prolongada/intensa o suficiente para "travar" a semente mesmo após o resfriamento.
+    </div>
+    <p>Técnicas de manejo: <b>priming/condicionamento</b> (osmótico com PEG, ou mátrico) — hidrata a semente até as fases I e II da embebição sem permitir a protrusão da radícula, sincronizando e acelerando a germinação e reduzindo termoinibição.</p>
+
+    <h3 class="sub-title">Luz, fitocromo e germinação</h3>
+    <p>A germinação de alface também é regulada pela luz — fenômeno relacionado à <b>skotodormência</b> (inibição da germinação no escuro, em certos genótipos). Essa resposta é mediada pelo <b>fitocromo</b>, pigmento fotomorfogenético e fotossensível que existe em duas formas fotoconversíveis:</p>
+    <ul>
+      <li><b>Pr</b> (forma inativa): absorve luz <b>vermelha</b> (~660 nm). Ao absorver luz vermelha, converte-se em Pfr.</li>
+      <li><b>Pfr</b> (forma ativa): absorve luz <b>vermelho-distante</b> (~730 nm) e é a forma que <b>estimula a germinação</b>. Sob vermelho-distante ou escuro, reverte-se de volta a Pr, e a germinação é inibida.</li>
+    </ul>
+    <div class="diagram-box">
+      <svg viewBox="0 0 380 130" xmlns="http://www.w3.org/2000/svg">
+        <rect x="30" y="40" width="110" height="50" rx="8" fill="#e8f5e9" stroke="#2e7d32" stroke-width="2"/>
+        <text x="85" y="70" font-size="15" fill="#1b5e20" text-anchor="middle" font-weight="bold">Pr (inativa)</text>
+        <rect x="240" y="40" width="110" height="50" rx="8" fill="#2e7d32" stroke="#1b5e20" stroke-width="2"/>
+        <text x="295" y="70" font-size="15" fill="#fff" text-anchor="middle" font-weight="bold">Pfr (ativa)</text>
+        <path d="M145,55 L235,55" stroke="#c62828" stroke-width="2" marker-end="url(#arrow1)"/>
+        <text x="190" y="48" font-size="10" fill="#c62828" text-anchor="middle">luz vermelha 660nm</text>
+        <path d="M235,80 L145,80" stroke="#37474f" stroke-width="2" marker-end="url(#arrow2)"/>
+        <text x="190" y="98" font-size="10" fill="#37474f" text-anchor="middle">verm.-distante 730nm / escuro</text>
+        <text x="190" y="115" font-size="10" fill="#2e7d32" text-anchor="middle">Pfr presente → GERMINA</text>
+        <defs>
+          <marker id="arrow1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#c62828"/></marker>
+          <marker id="arrow2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#37474f"/></marker>
+        </defs>
+      </svg>
+      <div class="diagram-caption">Fotoconversão do fitocromo: luz vermelha converte Pr → Pfr (estimula germinação); vermelho-distante/escuro reverte Pfr → Pr (inibe).</div>
+    </div>
+    <p>Há interação entre temperatura e exigência de luz: a sensibilidade à luz aumenta conforme a temperatura sobe — em temperaturas acima de ~25 °C, a ausência de luz reduz fortemente a germinação, mesmo em cultivares normalmente pouco fotossensíveis.</p>
+  </div>
+
+  <h2 class="section-title" id="alf-nutricao">3. Nutrição: Nitrogênio, Condutividade Elétrica e Irrigação</h2>
+  <div class="card alface-block">
+    <p>A alface é uma hortaliça de <b>ciclo curto e alta exigência nutricional</b>, adubada preferencialmente com fontes de N-P-K altamente solúveis.</p>
+    <ul>
+      <li><b>Excesso de nitrogênio</b>: estimula crescimento vegetativo acelerado e desproporcional — tecidos mais suculentos, paredes celulares mais finas e frágeis, folhas maiores porém menos consistentes. Isso reduz a <b>qualidade comercial</b> (menor firmeza/turgidez, pior conservação pós-colheita) e aumenta a <b>suscetibilidade fisiológica</b>: o crescimento acelerado da lâmina foliar ultrapassa a capacidade de translocação de cálcio (elemento pouco móvel) até as bordas das folhas jovens, favorecendo o <b>tipburn</b>. Tecidos mais tenros e ricos em N solúvel também são mais atrativos a pragas/patógenos.</li>
+      <li><b>Condutividade elétrica (CE) do solo</b>: se a CE for maior que <b>1,3 dS/m</b> antes da fertirrigação, deve-se aplicar apenas água pura (sem fertilizante) para não elevar ainda mais a salinidade. CE elevada aumenta o potencial osmótico da solução do solo, dificultando a <b>absorção de água</b> pelas raízes (a planta "concorre" osmoticamente com o solo salino), o que reduz a turgescência, retarda o <b>crescimento</b> e pode causar plasmólise/dano ao <b>sistema radicular</b> (redução de pelos radiculares, menor área de absorção).</li>
+      <li><b>Excesso de irrigação</b>: solo encharcado reduz a oxigenação do sistema radicular (hipóxia), favorecendo o <b>escurecimento das raízes</b> (necrose/apodrecimento radicular por anaerobiose e proliferação de patógenos de solo, como <i>Pythium</i> e <i>Rhizoctonia</i>). Raízes danificadas absorvem menos água e nutrientes, o que reduz a qualidade fisiológica geral da planta mesmo com fertilização adequada.</li>
+    </ul>
+  </div>
+
+  <h2 class="section-title" id="alf-disturbios">4. Distúrbios Fisiológicos: Tipburn e Pendoamento</h2>
+  <div class="card alface-block">
+    <h3 class="sub-title">Tipburn (queima dos bordos)</h3>
+    <p>Anomalia mais comum da alface: necrose dos bordos das folhas <b>jovens</b>, em rápida expansão (nas folhas internas do "miolo", nem sempre visível externamente em tipos repolhudos).</p>
+    <ul>
+      <li><b>Mobilidade do cálcio</b>: o Ca²⁺ é transportado quase exclusivamente pelo <b>xilema</b>, seguindo o fluxo de água — tem mobilidade praticamente nula via floema, então não é redistribuído de folhas velhas para as novas.</li>
+      <li><b>Transpiração</b>: folhas jovens em rápida expansão, ainda com pouca área foliar e cutícula pouco desenvolvida, transpiram proporcionalmente menos que folhas maduras — isso reduz o fluxo transpiratório (e, portanto, o transporte de Ca) exatamente para os tecidos que mais precisam do nutriente.</li>
+      <li><b>Crescimento acelerado</b>: quanto mais rápido o crescimento relativo da folha (favorecido por N em excesso, calor, boa umidade), maior a demanda de cálcio por unidade de tempo — e maior a chance de a oferta (limitada pelo fluxo xilemático) não acompanhar a demanda.</li>
+      <li><b>Folhas internas</b>: por ficarem parcialmente protegidas do ar externo (menor déficit de pressão de vapor ao redor), transpiram ainda menos que as folhas externas, concentrando o problema exatamente ali.</li>
+    </ul>
+    <div class="example-box">
+      <div class="label">O tipburn ocorre necessariamente por falta de cálcio no solo?</div>
+      <b>Não.</b> Na maioria dos casos o solo tem cálcio disponível em quantidade suficiente — o problema é fisiológico/de transporte interno (deficiência <b>localizada</b> nas folhas jovens por baixo fluxo transpiratório), não uma deficiência real de Ca no solo. Por isso a calagem sozinha não resolve; irrigação frequente e adubação de cálcio parcelada, junto com N, ajudam mais que apenas elevar o Ca do solo.
+    </div>
+    <p>A necrose pode também envolver dano à membrana/parede celular e, secundariamente, toxicidade do látex liberado pelo rompimento dos lactíferos nas bordas necrosadas.</p>
+
+    <h3 class="sub-title">Pendoamento precoce (bolting) e sabor amargo</h3>
+    <p>Temperaturas elevadas (>20 °C, agravado por dias longos) sinalizam à planta o fim do ciclo vegetativo e o início da fase reprodutiva. Esse estímulo térmico induz aumento da síntese endógena de <b>giberelinas</b>, hormônios que promovem o alongamento do caule (pendão floral) e a floração precoce. Junto ao pendoamento, a planta passa a produzir mais <b>látex</b> (compostos sesquiterpênicos amargos), o que confere <b>sabor amargo</b> às folhas e torna a alface comercialmente imprópria.</p>
+  </div>
+
+  <h2 class="section-title" id="alf-poscolheita">5. Pós-colheita: Respiração, Transpiração e Conservação</h2>
+  <div class="card alface-block">
+    <p>A perecibilidade da alface está diretamente associada à <b>respiração</b>: processo que degrada reservas para gerar energia, liberando parte dela como <b>calor vital</b>. Quanto mais acelerada a respiração, mais calor é gerado — aumentando a temperatura do produto e acelerando ainda mais seu próprio metabolismo (retroalimentação positiva que reduz a vida útil).</p>
+    <p>A <b>transpiração</b> excessiva causa perda de água/turgidez — perdas de massa fresca acima de ~5% já resultam em murcha visível e perda de "frescor" comercial.</p>
+    <ul>
+      <li><b>Fatores que reduzem a vida útil pós-colheita</b>: alta temperatura de campo no momento da colheita ("calor de campo"), ausência ou atraso do <b>pré-resfriamento</b>/hidrorresfriamento, quebra da cadeia do frio durante transporte/distribuição, dano mecânico nas folhas (aumenta área exposta à transpiração e infecção), e o próprio tipburn/pendoamento, que já deixam o tecido fisiologicamente debilitado antes da colheita.</li>
+      <li><b>Relação entre respiração, transpiração, temperatura e conservação</b>: a temperatura controla diretamente a taxa metabólica — reduzir a temperatura (resfriamento rápido/refrigeração) é a forma mais eficaz de reduzir simultaneamente respiração e transpiração, preservando reservas energéticas, retardando a senescência e mantendo turgidez, cor e crocância por mais tempo. Sem resfriamento imediato, a alta taxa respiratória e transpiratória combinadas aceleram a perda de qualidade e de vida de prateleira.</li>
+    </ul>
+  </div>
+
+  <div class="crop-banner cenoura">🥕 CENOURA (Daucus carota)</div>
+
+  <h2 class="section-title cenoura-title" id="cen-intro">6. Botânica, Clima e Temperatura</h2>
+  <div class="card cenoura-block">
+    <p>Pertence à família <b>Apiácea</b> (Apiaceae), grupo das raízes tuberosas, com ampla adaptação nas Regiões Sudeste e Sul, expandindo-se para Nordeste/Centro-Oeste graças a cultivares tolerantes ao calor.</p>
+    <p>A <b>temperatura</b> é o fator climático mais importante para a qualidade da raiz:</p>
+    <ul>
+      <li><b>10–15 °C</b>: favorece o alongamento das raízes e o desenvolvimento da coloração alaranjada característica (raízes longas e bem coloridas).</li>
+      <li><b>Acima de 21 °C</b>: estimula a formação de raízes <b>curtas</b> e com coloração deficiente.</li>
+      <li><b>Acima de 30 °C</b>: reduz o ciclo vegetativo, prejudicando desenvolvimento radicular e produtividade.</li>
+      <li>Existem cultivares tolerantes que formam boas raízes entre 18–25 °C (grupos Kuroda/Brasília/Kuronan).</li>
+      <li><b>Germinação</b>: ocorre entre 8 e 35 °C, sendo a faixa ideal 20–30 °C (emergência em 7–10 dias).</li>
+      <li><b>Florescimento precoce</b>: temperaturas <b>baixas associadas a dias longos</b> induzem florescimento prematuro (vernalização), efeito mais crítico em cultivares desenvolvidas para plantio em época quente.</li>
+    </ul>
+    <div class="example-box">
+      <div class="label">Resumo: crescimento e florescimento x temperatura</div>
+      A cenoura tem uma "janela térmica" estreita para produção ideal de raiz (10–20 °C aprox.): frio moderado favorece alongamento/cor, mas frio + fotoperíodo longo dispara florescimento (indesejável, pois desvia energia da raiz para a haste floral, tornando a raiz fibrosa e amarga). Calor excessivo (>30 °C), por outro lado, encurta o ciclo e prejudica tanto o tamanho quanto a coloração da raiz.
+    </div>
+  </div>
+
+  <h2 class="section-title cenoura-title" id="cen-cultivares">7. Cultivares e Grupos</h2>
+  <div class="card cenoura-block">
+    <ul>
+      <li><b>Nantes</b>: origem francesa, raízes cilíndricas (15–18 cm), coloração alaranjado-escura. <b>Muito sensível a doenças de folhagem</b> (queima-das-folhas/Alternaria) e exige clima <b>ameno/frio</b> — cultivo não recomendado em estações quentes/chuvosas. Ciclo de 90–110 dias.</li>
+      <li><b>Kuroda</b>: raízes cônicas, tolerante a temperaturas mais altas, boa resistência a doenças de folhagem em cultivo de verão. Ciclo ~100 dias.</li>
+      <li><b>Brasília</b> e <b>Kuronan</b>: desenvolvidas para cultivo de verão (Embrapa Hortaliças/Esalq), resistentes ao calor, alta resistência de campo à queima-das-folhas, baixo florescimento prematuro sob dias longos.</li>
+      <li><b>Tropical</b>: sensível ao florescimento precoce sob dias longos — deve ser cultivada em estação fria/dias curtos apesar de tolerar calor na parte foliar.</li>
+    </ul>
+  </div>
+
+  <h2 class="section-title cenoura-title" id="cen-solo">8. Solo e Adubação</h2>
+  <div class="card cenoura-block">
+    <h3 class="sub-title">Textura e compactação do solo</h3>
+    <p>Solos <b>muito argilosos e compactados</b> prejudicam a cenoura porque a raiz tuberosa precisa expandir-se radialmente empurrando as partículas do solo à sua volta — em solo compactado/argiloso a resistência mecânica é alta, causando:</p>
+    <ul>
+      <li>Raízes curtas, tortas, bifurcadas ("garfadas") ou deformadas, pois o ápice radicular desvia ao encontrar torrões/camadas compactadas.</li>
+      <li>Redução da aeração (menor macroporosidade) e da infiltração/drenagem de água, favorecendo encharcamento e apodrecimento.</li>
+      <li>Maior resistência à emergência de plântulas e menor uniformidade de estande.</li>
+      <li>Pior qualidade comercial (formato irregular reduz classificação/valor de venda).</li>
+    </ul>
+    <p>Por isso recomenda-se solo de <b>textura média</b>, solto, profundo, sem camadas compactadas, com bom preparo (aração + gradagem + canteiros elevados) e uso moderado de encanteirador (que, em excesso, forma crosta e compacta o subsolo).</p>
+
+    <h3 class="sub-title">Excesso de nitrogênio</h3>
+    <p>Assim como na alface, o excesso de N desloca o equilíbrio fonte-dreno em favor da <b>parte aérea</b>: folhagem exuberante e crescimento vegetativo vigoroso, em detrimento do enchimento e maturação da raiz. Isso atrasa a colheita, reduz o teor de açúcares/qualidade da raiz, pode aumentar a incidência de bifurcações e deixa a planta mais suscetível a acamamento e a doenças foliares (tecido mais tenro e denso, com microclima mais úmido dentro da copa).</p>
+
+    <h3 class="sub-title">Práticas para raízes uniformes e padrão comercial</h3>
+    <ul>
+      <li><b>Desbaste adequado</b> (espaçamento correto entre plantas) — evita competição e raízes tortas/finas por adensamento excessivo.</li>
+      <li><b>Preparo profundo do solo</b> (aração + gradagem, canteiros bem formados, sem camada compactada) — permite crescimento livre e retilíneo da raiz.</li>
+      <li>Complementares: calagem 3 meses antes do plantio (pH 6,0–6,5), rotação de culturas com adubos verdes, e adubação equilibrada conforme análise de solo.</li>
+    </ul>
+  </div>
+
+  <h2 class="section-title cenoura-title" id="cen-doencas">9. Doenças: Queima-das-folhas (Alternaria)</h2>
+  <div class="card cenoura-block">
+    <p>A <b>queima-das-folhas</b> é a doença mais comum da cenoura, causada principalmente por <b>Alternaria dauci</b> (mais frequente), além de <i>Cercospora carotae</i> e <i>Xanthomonas campestris</i> pv. <i>carotae</i> — os três podem coexistir na mesma planta/lesão. Causa necrose foliar que, em ataques severos, leva à desfolha completa e reduz o tamanho da raiz (menor área fotossintética = menor translocação de fotoassimilados para a raiz).</p>
+    <p>As cultivares do grupo <b>Nantes são as mais suscetíveis</b>, exigindo aplicação preventiva de fungicidas; já Brasília, Kuroda e Kuronan têm boa resistência de campo, quase dispensando controle químico.</p>
+  </div>
+
+</section>
+
+<!-- ================= DISSERTATIVAS ================= -->
+<section class="page" id="page-dissertativas">
+  <div class="qa-tabs">
+    <button class="qa-tab-btn active" data-qafilter="todas">Todas</button>
+    <button class="qa-tab-btn" data-qafilter="alface">🥬 Alface</button>
+    <button class="qa-tab-btn" data-qafilter="cenoura">🥕 Cenoura</button>
+  </div>
+  <div id="qaContainer"></div>
+</section>
+
+<!-- ================= SIMULADO ================= -->
+<section class="page" id="page-simulado">
+  <div class="quiz-toolbar">
+    <div class="quiz-tabs">
+      <button class="quiz-tab-btn active" data-filter="todas">Todas</button>
+      <button class="quiz-tab-btn" data-filter="alface">🥬 Alface</button>
+      <button class="quiz-tab-btn" data-filter="cenoura">🥕 Cenoura</button>
     </div>
     <div class="score-panel">
       <div class="score-badge">Acertos<br><b id="scoreCorrect">0</b></div>
-      <div class="score-badge">Respondidas<br><b id="scoreAnswered">0</b></div>
+      <div class="score-badge">Resp.<br><b id="scoreAnswered">0</b></div>
       <div class="score-badge">Total<br><b id="scoreTotal">0</b></div>
       <button class="reset-btn" id="resetBtn">Reiniciar</button>
     </div>
   </div>
-</header>
+  <div id="quizContainer"></div>
+</section>
 
-<main id="quizContainer"></main>
+</main>
 
-<footer>Revisão gerada a partir do material da disciplina · boa prova!</footer>
+</div>
+<!-- ============== fim OLERICULTURA ============== -->
+
+<footer>Revisão gerada a partir de material acadêmico de Hidrologia Aplicada, do livro "Cultura da Alface" (Incaper, 2022) e "A Cultura da Cenoura" (Embrapa) · boa prova!</footer>
 
 <script>
-const quizData = [
-// ===================== MANGA =====================
-{ id:"m1", culture:"manga", type:"block", mode:"VF", points:"2,0 pontos",
-  instruction:"Julgue as sentenças abaixo em Verdadeiras (V) ou Falsas (F):",
-  items:[
-    { text:"O paclobutrazol (PBZ) deve ser aplicado via foliar diretamente sobre a copa da mangueira, dispensando a irrigação posterior.", answer:false,
-      explain:"PBZ é aplicado via solo (drench sob a copa) e exige irrigação logo após, para levar o produto às raízes." },
-    { text:"A eficiência do PBZ está relacionada à cultivar, ao vigor da planta e ao efeito residual de aplicações anteriores, sendo a dose para 'Kent' e 'Haden' geralmente maior que para 'Tommy Atkins'.", answer:true,
-      explain:"'Kent' e 'Haden' são mais vigorosas e exigem dose maior que a cultivar-padrão 'Tommy Atkins'." },
-    { text:"As pulverizações com nitrato de potássio devem ser realizadas em ramos ainda jovens, com menos de 90 dias, para garantir maior absorção foliar.", answer:false,
-      explain:"O nitrato só deve ser aplicado em ramos maduros — nunca com menos de 90 dias." },
-    { text:"O estresse hídrico, quando utilizado no manejo da floração, tem como objetivo antecipar a maturação e a lignificação dos ramos vegetativos.", answer:true,
-      explain:"Correto: a redução de água acelera o repouso/maturação dos ramos." },
-    { text:"A antracnose da mangueira, causada por Colletotrichum gloeosporioides, é favorecida por baixa umidade relativa e ausência de chuvas durante a floração.", answer:false,
-      explain:"É o oposto: antracnose é favorecida por ALTA umidade relativa e chuva durante a floração." }
-  ]
-},
-{ id:"m2", culture:"manga", type:"block", mode:"CE", points:"2,0 pontos",
-  instruction:"Responda Certo (C) ou Errado (E):",
-  items:[
-    { text:"A poda de formação da mangueira é realizada anualmente, logo após cada colheita, com o objetivo de eliminar ramos doentes e restos de colheita.", answer:false,
-      explain:"A poda de formação é única, feita na implantação do pomar. A anual/pós-colheita é a poda de produção/limpeza." },
-    { text:"As cultivares 'Espada' e 'Coquinho', por serem poliembriônicas, são preferencialmente utilizadas como porta-enxerto, pois garantem maior uniformidade genética das mudas.", answer:true,
-      explain:"Correto: poliembrionia gera plantas clonais da matriz, garantindo uniformidade." },
-    { text:"A poda de abertura central consiste em eliminar ramos com ângulo de inserção maior que 45° em relação ao tronco.", answer:false,
-      explain:"É o contrário: eliminam-se ramos com ângulo MENOR que 45°." },
-    { text:"A poda mais severa da mangueira deve ser evitada quando a floração é programada para o período de altas temperaturas e precipitação elevada.", answer:true,
-      explain:"Correto: nessa época recomenda-se poda menos severa, aguardando 2-3 fluxos antes do retardante." }
-  ]
-},
-{ id:"m3", culture:"manga", type:"single", points:"1,0 ponto",
-  question:"Sobre o mecanismo fisiológico do paclobutrazol, é correto afirmar que ele:",
-  options:[
-    "Estimula a síntese de giberelinas nas raízes.",
-    "Inibe a biossíntese de giberelinas, favorecendo a diferenciação floral em detrimento do crescimento vegetativo.",
-    "Substitui a necessidade de irrigação após sua aplicação.",
-    "É eficiente apenas quando aplicado via foliar sobre panículas.",
-    "Atua exclusivamente como fungicida sistêmico."
-  ],
-  correct:1,
-  explain:"O PBZ bloqueia a rota biossintética das giberelinas, paralisando o crescimento vegetativo e favorecendo a indução floral."
-},
-{ id:"m4", culture:"manga", type:"single", points:"1,0 ponto",
-  question:"Quanto às doenças fúngicas da mangueira, considere: I. A antracnose é favorecida por chuva e alta umidade relativa durante o florescimento. II. A seca-da-mangueira (Ceratocystis fimbriata) é disseminada principalmente pela broca Hypocryphalus mangiferae e pode levar a planta à morte. III. O oídio é favorecido por alta umidade relativa e ausência de vento. IV. A morte descendente (Lasiodiplodia theobromae) é favorecida por estresse hídrico/nutricional, entrando por ferimentos de poda. V. A malformação floral (Fusarium subglutinans) não guarda relação com o ácaro Aceria mangiferae. Estão corretas:",
-  options:[
-    "I, II e IV.",
-    "I, III e V.",
-    "II, III e IV.",
-    "I, II, III e IV.",
-    "Todas estão corretas."
-  ],
-  correct:0,
-  explain:"III é falsa (oídio é favorecido por BAIXA umidade relativa); V é falsa (a malformação está associada à ação do ácaro Aceria, que favorece a infecção por Fusarium)."
-},
-{ id:"m5", culture:"manga", type:"block", mode:"VF", points:"1,0 ponto",
-  instruction:"Quanto às pragas da mangueira, assinale V ou F:",
-  items:[
-    { text:"A mosca Ceratitis capitata é polífaga, com mais de 200 hospedeiros, e ataca preferencialmente frutos já amarelecidos ou maduros.", answer:true, explain:"Correto." },
-    { text:"As espécies do gênero Anastrepha possuem hospedeiros mais específicos e ovipositam preferencialmente em frutos verdes ou 'de vez'.", answer:true, explain:"Correto." },
-    { text:"O ácaro Aceria mangiferae não guarda relação com a disseminação de doenças fúngicas na mangueira.", answer:false, explain:"Falso: é o principal vetor do Fusarium spp., causador da malformação." },
-    { text:"A cochonilha Aulacaspis tubercularis é considerada a espécie de maior importância para pomares destinados à exportação.", answer:true, explain:"Correto: provoca manchas/deformações que desqualificam o fruto para exportação." },
-    { text:"A técnica do inseto estéril (TIE) consiste na liberação de fêmeas estéreis para competir com machos selvagens.", answer:false, explain:"Falso: são liberados MACHOS estéreis para copular com fêmeas selvagens, gerando ovos inviáveis." }
-  ]
-},
-{ id:"m6", culture:"manga", type:"single", points:"1,0 ponto",
-  question:"Sobre os porta-enxertos utilizados na propagação da mangueira, é correto afirmar:",
-  options:[
-    "'Tommy Atkins' e 'Haden' são as cultivares mais utilizadas como porta-enxerto por serem poliembriônicas.",
-    "'Espada' e 'Coquinho' são poliembriônicas e mais utilizadas como porta-enxerto, sendo a 'Espada' mais vigorosa e tolerante à seca-da-mangueira.",
-    "A propagação por sementes monoembriônicas é preferível para formação de porta-enxertos, por garantir uniformidade genética.",
-    "O porta-enxerto deve ser sempre obtido por estaquia, nunca por sementes.",
-    "Não há diferença de vigor entre as cultivares utilizadas como porta-enxerto."
-  ],
-  correct:1,
-  explain:"'Espada' e 'Coquinho' são poliembriônicas; a 'Espada' é mais vigorosa e tolerante à seca-da-mangueira."
-},
-{ id:"m7", culture:"manga", type:"block", mode:"CE", points:"1,0 ponto",
-  instruction:"Responda Certo (C) ou Errado (E):",
-  items:[
-    { text:"A mangueira necessita de um período seco de cerca de 4 meses, seguido de estação chuvosa prolongada, para floração regular.", answer:false,
-      explain:"É o inverso: o período seco de referência é mais longo (~8 meses) e o chuvoso mais curto (~4 meses)." },
-    { text:"O ponto de colheita da manga pode ser determinado pela coloração da polpa e pela idade do fruto em dias após a floração.", answer:true, explain:"Correto." },
-    { text:"O tratamento hidrotérmico para controle de mosca-das-frutas em manga destinada à exportação consiste na imersão em água quente entre 75 e 90 minutos, conforme o peso do fruto.", answer:true, explain:"Correto (46,1°C, 75min para frutos <425g ou 90min para frutos maiores)." }
-  ]
-},
-{ id:"m8", culture:"manga", type:"single", points:"1,0 ponto",
-  question:"Assinale a alternativa que apresenta a sequência correta de manejo para indução floral da mangueira em condições irrigadas do Semiárido:",
-  options:[
-    "Aplicação de nitrato → poda pós-colheita → aplicação de PBZ → colheita.",
-    "Poda pós-colheita → emissão de fluxos vegetativos → aplicação de PBZ e/ou estresse hídrico → maturação dos ramos → aplicação de nitrato → floração.",
-    "Aplicação de PBZ → poda de formação → colheita → aplicação de nitrato.",
-    "Estresse hídrico → poda severa → aplicação simultânea de PBZ e nitrato.",
-    "Nenhuma sequência de manejo é necessária; a floração ocorre espontaneamente em qualquer época."
-  ],
-  correct:1,
-  explain:"Sequência correta: poda → fluxos vegetativos → PBZ/estresse hídrico → maturação dos ramos → nitrato → floração."
-},
-{ id:"m9", culture:"manga", type:"single", points:"1,0 ponto",
-  question:"Quanto à nutrição mineral da mangueira, considere: I. É uma das culturas mais exigentes em cálcio, com teores foliares de Ca próximos ao dobro dos de N. II. A deficiência de cálcio está associada ao colapso interno (soft nose). III. O potássio deve ser aplicado em maior proporção logo após a colheita, correspondendo a 50% da dose anual. IV. Zn e B são os micronutrientes com deficiência mais comum. V. A calagem deve ser evitada em pomares com pH já elevado, mesmo com baixos teores de Ca. Estão corretas:",
-  options:[
-    "I, II e IV.",
-    "I, II, III e IV.",
-    "II, III e V.",
-    "Apenas I e II.",
-    "Todas estão corretas."
-  ],
-  correct:0,
-  explain:"III é falsa (50% do N — não do K — é aplicado pós-colheita; o K pós-colheita é 25%); V é falsa (nesse caso usa-se gesso, não se deve evitar a correção de Ca)."
-},
-{ id:"m10", culture:"manga", type:"block", mode:"VF", points:"1,0 ponto",
-  instruction:"Julgue em Verdadeiro (V) ou Falso (F):",
-  items:[
-    { text:"A manga é um fruto climatérico e deve ser colhida no ponto de maturidade fisiológica, ainda com a casca predominantemente verde.", answer:true, explain:"Correto." },
-    { text:"A escala de maturação por cor de polpa varia de creme a alaranjado/amarelo intenso, sendo um indicador auxiliar quando a aparência externa não é suficiente.", answer:true, explain:"Correto." },
-    { text:"Frutos de manga destinados à exportação dispensam qualquer tratamento pós-colheita contra mosca-das-frutas quando a área de produção não apresenta histórico da praga.", answer:false,
-      explain:"Falso: o tratamento hidrotérmico é exigido pelos países importadores (USDA) independentemente do histórico local." }
-  ]
-},
-{ id:"m11", culture:"manga", type:"single", points:"1,0 ponto",
-  question:"Mangifera indica pertence a qual família botânica?",
-  options:["Rutaceae","Anacardiaceae","Musaceae","Myrtaceae","Bromeliaceae"],
-  correct:1,
-  explain:"A mangueira pertence à família Anacardiaceae."
-},
-{ id:"m12", culture:"manga", type:"block", mode:"VF", points:"1,0 ponto",
-  instruction:"Julgue em Verdadeiro (V) ou Falso (F):",
-  items:[
-    { text:"A semente de manga perde rapidamente o poder germinativo, devendo ser semeada em até 15 dias após a extração do fruto.", answer:true, explain:"Correto." },
-    { text:"A garfagem de fenda cheia é um método de enxertia que utiliza porta-enxerto e garfo de diâmetros semelhantes (8 a 12 mm).", answer:true, explain:"Correto." },
-    { text:"A propagação por sementes monoembriônicas garante uniformidade genética idêntica à planta matriz.", answer:false,
-      explain:"Falso: sementes monoembriônicas geram variabilidade genética (segregação). Só as poliembriônicas clonam a matriz." }
-  ]
-},
-{ id:"m13", culture:"manga", type:"single", points:"1,0 ponto",
-  question:"Qual cultivar de manga é caracterizada pela autoincompatibilidade, exigindo cultivares polinizadoras no pomar?",
-  options:["Tommy Atkins","Espada","Haden","Rosa","Keitt"],
-  correct:2,
-  explain:"A 'Haden' apresenta acentuada autoincompatibilidade, exigindo outras variedades para polinização."
-},
-{ id:"m14", culture:"manga", type:"single", points:"1,0 ponto",
-  question:"Quanto às exigências climáticas e edáficas da mangueira, considere: I. Um período seco de 4 meses seguido de 8 meses chuvosos é ideal para a floração regular. II. A profundidade do solum (horizontes A+B) determina o volume de solo explorado pelas raízes. III. Regiões áridas/semiáridas irrigadas favorecem maior radiação solar, melhorando a coloração dos frutos. IV. A umidade do ar estimula a brotação das flores, sendo as chuvas favoráveis nesta fase. Estão corretas:",
-  options:["I e II","II e III","I, III e IV","II, III e IV","Todas"],
-  correct:1,
-  explain:"I está invertida (o ideal é ~4 meses chuvosos seguidos de ~8 meses secos); IV está errada na parte final (as chuvas são DESfavoráveis na fase de floração)."
-},
-{ id:"m15", culture:"manga", type:"block", mode:"VF", points:"1,0 ponto",
-  instruction:"Julgue em Verdadeiro (V) ou Falso (F):",
-  items:[
-    { text:"O tratamento com cera de carnaúba aplicado na pós-colheita tem função apenas estética, sem relação com a fisiologia de conservação do fruto.", answer:false,
-      explain:"Falso: a cera também modifica a atmosfera interna do fruto, contribuindo para a conservação (além do efeito estético)." },
-    { text:"A temperatura ideal de armazenamento e transporte da manga está entre 10°C e 13°C.", answer:true, explain:"Correto." }
-  ]
-},
+/* ==================================================================
+   HIDROLOGIA — IIFE isolado (usa apenas classes/ids prefixados h-)
+   ================================================================== */
+(function(){
+document.querySelectorAll(".h-maintab-btn").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    document.querySelectorAll(".h-maintab-btn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    const page = btn.dataset.page;
+    document.querySelectorAll(".h-page").forEach(p=>p.classList.remove("active"));
+    document.getElementById("h-page-"+page).classList.add("active");
+    document.getElementById("h-subnav").style.display = (page==="revisao") ? "flex" : "none";
+    window.scrollTo({top:0, behavior:"smooth"});
+  });
+});
 
-// ===================== BANANA =====================
-{ id:"b1", culture:"banana", type:"block", mode:"VF", points:"2,0 pontos",
+const quizData = [
+{ id:"hq1", topic:"ciclo", type:"block", mode:"VF", points:"2,0 pontos",
   instruction:"Julgue as sentenças abaixo em Verdadeiras (V) ou Falsas (F):",
   items:[
-    { text:"O sistema de condução 'mãe-filha-neta' consiste em manter apenas duas gerações por touceira, eliminando-se todo e qualquer rebento adicional.", answer:false,
-      explain:"Falso: mantêm-se TRÊS gerações — mãe, filha e neta." },
-    { text:"O desbaste da bananeira, realizado com a ferramenta 'lurdinha', deve remover inclusive a gema apical do rebento eliminado, evitando sua rebrota.", answer:true, explain:"Correto." },
-    { text:"O desbaste é geralmente realizado aos 4, 6 e 10 meses após o plantio.", answer:true, explain:"Correto." },
-    { text:"O excesso de rebentos na touceira favorece o aumento do tamanho e peso dos frutos, sendo recomendado manter o maior número possível de plantas-filhas.", answer:false,
-      explain:"Falso: o excesso de rebentos REDUZ o tamanho e peso dos frutos." },
-    { text:"A muda tipo 'chifrão' corresponde ao estágio com 0,20 a 0,30 m de altura e 2 a 3 meses de idade.", answer:false,
-      explain:"Falso: essa descrição é do 'chifrinho'. O 'chifrão' tem 0,60 a 1,50 m e 7 a 9 meses." }
-  ]
-},
-{ id:"b2", culture:"banana", type:"block", mode:"CE", points:"2,0 pontos",
+    { text:"O ciclo hidrológico é movido exclusivamente pela força da gravidade, sem participação da energia solar.",
+      answer:false, explain:"Falso: o ciclo é movido tanto pela energia solar (evaporação) quanto pela gravidade (escoamento/infiltração)." },
+    { text:"A evapotranspiração corresponde à soma da evaporação do solo com a transpiração das plantas.",
+      answer:true, explain:"Correto." },
+    { text:"A interceptação é a parcela da água de chuva retida pela vegetação antes de atingir o solo.",
+      answer:true, explain:"Correto." },
+    { text:"O escoamento de base é responsável por manter a perenidade dos rios durante períodos de estiagem.",
+      answer:true, explain:"Correto." },
+    { text:"A percolação refere-se exclusivamente ao escoamento superficial da água sobre o terreno.",
+      answer:false, explain:"Falso: percolação é o movimento vertical da água infiltrada até o lençol freático, não escoamento superficial." },
+  ]},
+{ id:"hq2", topic:"impactos", type:"block", mode:"CE", points:"2,0 pontos",
   instruction:"Responda Certo (C) ou Errado (E):",
   items:[
-    { text:"As mudas micropropagadas são obtidas por cultura de tecidos em laboratórios (biofábricas) e são livres de pragas, doenças e nematoides.", answer:true, explain:"Correto." },
-    { text:"O chifrinho é o estágio de muda mais desenvolvido, já apto a emitir inflorescência.", answer:false,
-      explain:"Falso: o chifrinho é o estágio MENOS desenvolvido; o mais desenvolvido é a muda adulta." },
-    { text:"Em áreas com histórico de Mal-do-Panamá, recomenda-se preferencialmente o uso de mudas micropropagadas.", answer:true, explain:"Correto." },
-    { text:"O descorticamento da muda convencional consiste na retirada superficial do tecido escuro que envolve o rizoma, eliminando galerias de broca e lesões de nematoides.", answer:true, explain:"Correto." }
-  ]
-},
-{ id:"b3", culture:"banana", type:"single", points:"1,0 ponto",
-  question:"Por que o potássio é considerado o nutriente mais crítico para a bananeira?",
-  options:[
-    "Porque substitui integralmente a função do nitrogênio na síntese proteica.",
-    "Porque é o nutriente exigido em menor quantidade pela cultura.",
-    "Porque atua no transporte de fotoassimilados para os frutos e na regulação hídrica das células, refletindo no tamanho e peso do cacho.",
-    "Porque corrige a acidez do solo, dispensando a calagem.",
-    "Porque é absorvido exclusivamente pelas raízes mais velhas da planta."
-  ],
-  correct:2,
-  explain:"O K comanda o carregamento do floema (transporte de fotoassimilados) e a regulação osmótica, refletindo no enchimento do cacho."
-},
-{ id:"b4", culture:"banana", type:"single", points:"1,0 ponto",
-  question:"Quanto às principais doenças da bananeira, considere: I. O Mal-do-Panamá é causado por um fungo de solo (Fusarium oxysporum f.sp. cubense) que sobrevive por mais de 20 anos, sem cura, apenas resistência genética. II. O Moko (Ralstonia solanacearum) pode ser diferenciado do Mal-do-Panamá pelo teste do copo, que revela exsudato bacteriano leitoso. III. A Sigatoka amarela manifesta-se na face inferior da folha, e a negra na face superior. IV. A mancha de cordana é doença secundária que pode ser confundida com a Sigatoka amarela, mas não compromete significativamente a produção. V. O mosaico da bananeira é causado por bactéria disseminada por nematoides do solo. Estão corretas:",
-  options:["I, II e IV.","I, III e V.","II, III e IV.","I, II, IV e V.","Todas estão corretas."],
-  correct:0,
-  explain:"III está invertida (amarela = face superior; negra = face inferior); V é falsa (o mosaico é causado por VÍRUS — CMV — disseminado por pulgões, não bactéria)."
-},
-{ id:"b5", culture:"banana", type:"single", points:"1,0 ponto",
-  question:"Quanto à fitossanidade da bananeira, NÃO é correto afirmar:",
-  options:[
-    "O nematoide Radopholus similis (cavernícola) é o principal nematoide da cultura, causando tombamento de plantas.",
-    "A broca-do-rizoma (Cosmopolites sordidus) pode causar perdas de até 100% em variedades do tipo Comprida.",
-    "O manejo integrado da broca-do-rizoma inclui iscas atrativas associadas a Beauveria bassiana e armadilhas com feromônio.",
-    "A Sigatoka negra já está amplamente disseminada em todos os estados do Nordeste, sendo endêmica na região desde a década de 1980.",
-    "A variedade 'Maçã' é altamente suscetível ao Mal-do-Panamá."
-  ],
-  correct:3,
-  explain:"Falso: a Sigatoka negra ainda NÃO está disseminada no Nordeste — é motivo de alerta quarentenário, não doença endêmica na região."
-},
-{ id:"b6", culture:"banana", type:"block", mode:"VF", points:"1,0 ponto",
-  instruction:"Julgue em Verdadeiro (V) ou Falso (F):",
+    { text:"O desmatamento aumenta a infiltração e reduz o escoamento superficial.",
+      answer:false, explain:"Errado: é o contrário — desmatamento reduz infiltração/interceptação e aumenta o escoamento superficial." },
+    { text:"A urbanização, ao impermeabilizar o solo, reduz o tempo de concentração da bacia e aumenta os picos de vazão.",
+      answer:true, explain:"Certo." },
+    { text:"O assoreamento é causado pelo acúmulo de sedimentos no leito dos rios, reduzindo sua capacidade de vazão.",
+      answer:true, explain:"Certo." },
+    { text:"A eutrofização está associada à falta de nutrientes na água.",
+      answer:false, explain:"Errado: eutrofização é causada pelo EXCESSO de nutrientes (N e P), não pela falta." },
+  ]},
+{ id:"hq3", topic:"bacia", type:"single", points:"1,0 ponto",
+  question:"O divisor freático (ou subterrâneo) de uma bacia hidrográfica é determinado por:",
+  options:["Topografia da superfície","Estrutura geológica","Cobertura vegetal","Precipitação média anual","Uso do solo"],
+  correct:1, explain:"O divisor freático é determinado pela estrutura geológica, delimitando o reservatório de água subterrânea." },
+{ id:"hq4", topic:"bacia", type:"single", points:"1,0 ponto",
+  question:"Sobre o coeficiente de compacidade (Kc) de uma bacia hidrográfica, é correto afirmar:",
+  options:["Kc é sempre menor que 1.",
+    "Quanto mais próximo de 1, mais a bacia se assemelha a um círculo e mais suscetível a enchentes ela é.",
+    "Kc relaciona a largura média com o comprimento axial da bacia.",
+    "Kc não depende do perímetro da bacia.",
+    "Bacias alongadas sempre têm Kc próximo de 1."],
+  correct:1, explain:"Kc ≥ 1 sempre; quanto mais próximo de 1, mais circular a bacia e maior a suscetibilidade a enchentes." },
+{ id:"hq5", topic:"bacia", type:"single", points:"1,5 ponto (cálculo)",
+  question:"Uma bacia hidrográfica tem área de 625 km² e perímetro de 140 km. Usando Kc ≈ 0,28 × P/√A, o coeficiente de compacidade dessa bacia é aproximadamente:",
+  options:["0,57","1,57","2,57","0,28","5,60"],
+  correct:1, explain:"√625 = 25; P/√A = 140/25 = 5,6; Kc = 0,28 × 5,6 ≈ 1,57." },
+{ id:"hq6", topic:"bacia", type:"single", points:"1,0 ponto",
+  question:"O fator de forma (Kf = A/L²) de uma bacia hidrográfica indica que bacias com Kf pequeno são:",
+  options:["Mais suscetíveis a enchentes, pois concentram o escoamento.",
+    "Mais circulares.",
+    "Mais alongadas e menos suscetíveis a enchentes, pois é menos provável que uma chuva cubra toda sua extensão simultaneamente.",
+    "Independentes da declividade do terreno.",
+    "Sempre maiores que 1."],
+  correct:2, explain:"Kf pequeno = bacia alongada = menor chance de chuva intensa cobrir toda a extensão ao mesmo tempo = menos suscetível a enchente." },
+{ id:"hq7", topic:"bacia", type:"single", points:"1,5 ponto (cálculo)",
+  question:"Uma bacia possui área de 300 km² e comprimento axial de 50 km. O fator de forma (Kf = A/L²) dessa bacia é:",
+  options:["0,06","0,12","1,20","6,00","0,012"],
+  correct:1, explain:"Kf = 300 / 50² = 300/2500 = 0,12." },
+{ id:"hq8", topic:"bacia", type:"single", points:"1,0 ponto",
+  question:"A densidade de drenagem (Dd) de uma bacia é obtida por:",
+  options:["Dd = A/P","Dd = ΣL/A (soma dos comprimentos dos cursos d'água dividida pela área)","Dd = P/A","Dd = L²/A","Dd = A/L"],
+  correct:1, explain:"Dd = soma dos comprimentos de todos os cursos d'água dividida pela área de drenagem." },
+{ id:"hq9", topic:"bacia", type:"block", mode:"VF", points:"2,0 pontos",
+  instruction:"Sobre o critério de Horton-Strahler, julgue em V ou F:",
   items:[
-    { text:"A ordem decrescente de exigência de macronutrientes pela bananeira é K > N > Ca > Mg > S > P.", answer:true, explain:"Correto." },
-    { text:"O déficit hídrico prolongado, comum em regiões de sequeiro como a Zona da Mata de Pernambuco, não representa fator limitante relevante para a cultura.", answer:false,
-      explain:"Falso: o déficit hídrico é justamente o principal fator limitante em cultivo de sequeiro." },
-    { text:"A calagem deve ser realizada com antecedência mínima de 30 a 60 dias antes do plantio.", answer:true, explain:"Correto." },
-    { text:"B e Zn são os micronutrientes com deficiência mais frequente na bananeira.", answer:true, explain:"Correto." },
-    { text:"Solos do tipo Gleissolo, comuns em várzeas, dispensam sistema de drenagem para o cultivo da bananeira.", answer:false,
-      explain:"Falso: Gleissolos têm lençol freático elevado e EXIGEM sistema de drenagem." }
-  ]
-},
-{ id:"b7", culture:"banana", type:"single", points:"1,0 ponto",
-  question:"Sobre a colheita da banana, é correto afirmar que:",
-  options:[
-    "É um fruto não-climatérico, devendo ser colhido apenas quando completamente maduro na planta.",
-    "É um fruto climatérico, devendo ser colhido ainda verde, cerca de 120 dias após a emissão da inflorescência.",
-    "Deve ser colhida apenas quando a casca apresentar coloração amarela uniforme.",
-    "A colheita independe da distância entre o local de produção e o ponto de venda.",
-    "Não há relação entre o corte do pseudocaule e o manejo da colheita."
-  ],
-  correct:1,
-  explain:"A banana é climatérica e deve ser colhida verde, ~120 dias após a emissão do 'coração'."
-},
-{ id:"b8", culture:"banana", type:"single", points:"1,0 ponto",
-  question:"Quanto aos grupos genômicos e cultivares de bananeira, considere: I. O grupo AAA inclui o subgrupo Cavendish (Nanica, Nanicão, Grande Naine) e a 'Maçã'. II. O grupo AAB corresponde aos tipos Prata/Pacovan e Terra/Comprida, geralmente mais rústicos. III. A 'Pacovan Ken' é um híbrido com melhor desempenho agronômico que a 'Pacovan' que lhe deu origem. IV. A 'Tropical', do tipo Maçã, é suscetível ao Mal-do-Panamá assim como sua cultivar de origem. V. Os grupos genômicos derivam do cruzamento entre Musa acuminata (genoma A) e Musa balbisiana (genoma B). Estão corretas:",
-  options:["I, II, III e V.","I, II, IV e V.","Apenas I, II e V.","Todas estão corretas.","Apenas III e IV."],
-  correct:0,
-  explain:"IV é falsa: a 'Tropical' é TOLERANTE ao Mal-do-Panamá, ao contrário da 'Maçã'."
-},
-{ id:"b9", culture:"banana", type:"block", mode:"CE", points:"1,0 ponto",
+    { text:"Um canal sem tributários (nascente) recebe ordem 1.", answer:true, explain:"Correto." },
+    { text:"Quando dois canais de mesma ordem se encontram, a ordem do canal resultante permanece a mesma dos formadores.",
+      answer:false, explain:"Falso: a ordem sobe uma unidade quando dois canais de mesma ordem se encontram." },
+    { text:"Quando dois canais de ordens diferentes se encontram, a ordem do canal resultante é igual à maior das duas ordens.",
+      answer:true, explain:"Correto." },
+    { text:"A ordem do curso d'água principal reflete o grau de ramificação do sistema de drenagem.", answer:true, explain:"Correto." },
+  ]},
+{ id:"hq10", topic:"bacia", type:"single", points:"1,0 ponto",
+  question:"Qual afirmativa diferencia corretamente a declividade da bacia da declividade do curso d'água principal?",
+  options:["São a mesma coisa e usam o mesmo método de cálculo.",
+    "A declividade da bacia é obtida por amostragem estatística de pontos na área (método das quadrículas associadas a um vetor); a declividade do rio é obtida a partir do perfil longitudinal do curso d'água principal.",
+    "A declividade do rio é sempre maior que a declividade média da bacia.",
+    "A declividade da bacia não influencia o tempo de concentração.",
+    "Nenhuma das duas influencia a erosão do solo."],
+  correct:1, explain:"São métodos distintos: declividade da bacia (amostragem em toda a área) x declividade do rio (perfil longitudinal do curso principal)." },
+{ id:"hq11", topic:"bacia", type:"single", points:"1,0 ponto",
+  question:"A declividade S10-85 de um curso d'água é calculada a partir de:",
+  options:["Diferença entre as cotas máxima e mínima dividida pelo comprimento total do rio.",
+    "Altitudes correspondentes a 10% e 85% do comprimento do rio (medido a partir da foz), divididas por 75% do comprimento do rio.",
+    "Área abaixo da curva do perfil longitudinal.",
+    "Tempo de percurso da água no canal natural.",
+    "Média aritmética simples de todas as cotas do perfil."],
+  correct:1, explain:"S10-85 = (z85% − z10%) / (0,75 × L), evitando distorção de trechos muito íngremes perto da nascente." },
+{ id:"hq12", topic:"bacia", type:"block", mode:"CE", points:"2,0 pontos",
   instruction:"Responda Certo (C) ou Errado (E):",
   items:[
-    { text:"A climatização (maturação controlada) da banana utiliza etileno ou etephon, em câmaras com temperatura entre 13,9°C e 23,9°C e umidade relativa entre 85% e 95%.", answer:true, explain:"Correto." },
-    { text:"Bananas de variedades e origens diferentes podem ser climatizadas na mesma câmara sem prejuízo à uniformidade de maturação.", answer:false,
-      explain:"Falso: variedades/origens diferentes NÃO devem ser climatizadas juntas — maturação desuniforme." },
-    { text:"A classificação da banana tipo Prata/Pacovan considera o comprimento e o diâmetro do fruto, sendo frutos acima de 16 cm classificados como tipo exportação.", answer:true, explain:"Correto." }
-  ]
-},
-{ id:"b10", culture:"banana", type:"single", points:"1,0 ponto",
-  question:"Assinale a alternativa correta sobre o manejo do desbaste e da desfolha na bananeira:",
-  options:[
-    "A desfolha deve ser evitada, pois reduz a luminosidade e aumenta a incidência de Sigatoka.",
-    "O desbaste elimina apenas a parte aérea do rebento indesejado, preservando sua gema apical para rebrota controlada.",
-    "A desfolha remove folhas velhas e doentes, contribuindo para reduzir o inóculo de Sigatoka e melhorar a luminosidade do cacho.",
-    "O sistema mãe-filha-neta é aplicável apenas em cultivares do grupo AAA.",
-    "O desbaste deve ser realizado uma única vez, imediatamente após o plantio."
-  ],
-  correct:2,
-  explain:"A desfolha remove material doente/velho, reduzindo inóculo de Sigatoka e melhorando a luminosidade."
-},
-{ id:"b11", culture:"banana", type:"single", points:"1,0 ponto",
-  question:"A bananeira pertence a qual família botânica?",
-  options:["Musaceae","Anacardiaceae","Bromeliaceae","Poaceae","Caricaceae"],
-  correct:0,
-  explain:"A bananeira (Musa spp.) pertence à família Musaceae."
-},
-{ id:"b12", culture:"banana", type:"block", mode:"VF", points:"1,0 ponto",
+    { text:"A curva hipsométrica representa a variação de elevação dos terrenos da bacia em relação à porcentagem de área acumulada.",
+      answer:true, explain:"Certo." },
+    { text:"A altitude mediana da bacia corresponde à cota onde se encontra 50% da área de drenagem acumulada.",
+      answer:true, explain:"Certo." },
+    { text:"O retângulo equivalente é construído de modo que tenha a mesma área, mesmo perímetro e mesmo coeficiente de compacidade da bacia natural.",
+      answer:true, explain:"Certo." },
+    { text:"A curva hipsométrica não tem relação com a precipitação ou evapotranspiração da bacia.",
+      answer:false, explain:"Errado: a elevação média influencia temperatura, precipitação e evapotranspiração da bacia." },
+  ]},
+{ id:"hq13", topic:"bacia", type:"single", points:"1,0 ponto",
+  question:"O Diagnóstico Físico-Conservacionista (DFC) utiliza parâmetros morfométricos para avaliar principalmente:",
+  options:["A qualidade química da água do rio principal.",
+    "O grau de proteção/degradação da cobertura vegetal e do solo da bacia, comparando a vegetação atual com a original.",
+    "A vazão máxima histórica do curso d'água.",
+    "O custo de implantação de barragens.",
+    "A temperatura média anual da região."],
+  correct:1, explain:"O DFC avalia o grau de proteção/degradação da cobertura vegetal e do solo, base para a aptidão de uso da terra." },
+{ id:"hq14", topic:"ciclo", type:"single", points:"1,0 ponto",
+  question:"Na equação simplificada do balanço hídrico de uma bacia (P = ET + Q + ΔS), o termo Q representa:",
+  options:["A precipitação total.","A evapotranspiração.","O deflúvio (vazão de saída da bacia).","A variação do armazenamento.","A infiltração profunda."],
+  correct:2, explain:"Q é o deflúvio, ou seja, a vazão de saída da bacia pela seção exutória." },
+{ id:"hq15", topic:"impactos", type:"single", points:"1,5 ponto",
+  question:"Quanto aos impactos das atividades humanas sobre os recursos hídricos, considere: I. O desmatamento reduz a interceptação e a infiltração, aumentando o escoamento superficial. II. A urbanização normalmente aumenta a infiltração devido à compactação do solo. III. A erosão de áreas desmatadas é uma das principais causas de assoreamento dos cursos d'água. IV. A eutrofização é causada pelo excesso de nutrientes, geralmente nitrogênio e fósforo, lançados nos corpos d'água. Estão corretas:",
+  options:["I, III e IV.","I e II.","II e III.","Apenas IV.","Todas."],
+  correct:0, explain:"II é falsa: a urbanização IMPERMEABILIZA o solo e reduz a infiltração, não aumenta." },
+{ id:"hq16", topic:"bacia", type:"single", points:"1,0 ponto",
+  question:"Quando o divisor topográfico e o divisor freático de uma bacia não coincidem, o que ocorre na prática dos estudos hidrológicos?",
+  options:["A bacia deixa de existir como unidade hidrológica.",
+    "Ocorrem fugas de água entre bacias vizinhas, mas geralmente são desprezadas nos cálculos por se compensarem.",
+    "O balanço hídrico torna-se impossível de ser aplicado.",
+    "A área de drenagem deve ser medida apenas pelo divisor freático.",
+    "O escoamento de base deixa de existir."],
+  correct:1, explain:"Ocorrem fugas entre bacias vizinhas, mas normalmente são desprezadas no balanço hídrico, pois tendem a se compensar." },
+{ id:"hq17", topic:"bacia", type:"block", mode:"VF", points:"1,5 ponto",
   instruction:"Julgue em Verdadeiro (V) ou Falso (F):",
   items:[
-    { text:"O chifre é o estágio de muda com 0,30 a 0,60 m de altura.", answer:true, explain:"Correto." },
-    { text:"A muda adulta já está apta a emitir inflorescência.", answer:true, explain:"Correto." },
-    { text:"A micropropagação reserva geralmente 5% das mudas no viveiro para atender necessidades de replantio.", answer:true, explain:"Correto." }
-  ]
-},
-{ id:"b13", culture:"banana", type:"single", points:"1,0 ponto",
-  question:"Qual cultivar de banana é altamente suscetível ao Mal-do-Panamá, sendo cultivada apenas em áreas isentas da doença?",
-  options:["Pacovan","Maçã","Grande Naine","Thap Maeo","Comprida Verdadeira"],
-  correct:1,
-  explain:"A 'Maçã' é altamente suscetível ao Mal-do-Panamá, restrita a áreas sem histórico do fungo."
-},
-{ id:"b14", culture:"banana", type:"single", points:"1,0 ponto",
-  question:"Quanto à adubação verde e cobertura do solo na bananicultura, considere: I. Leguminosas como crotalária e mucuna-preta podem fixar entre 150 e 210 kg de N/ha/ano. II. A biomassa da própria bananeira (folhas e pseudocaule) pode ser usada como cobertura morta, devolvendo ao solo boa parte da matéria orgânica produzida. III. A adubação verde não contribui para o controle de plantas invasoras. IV. A cobertura morta com biomassa da bananeira deve ser mantida a uma espessura aproximada de 5 a 10 cm. Estão corretas:",
-  options:["I, II e IV.","I e III.","II e III.","Apenas IV.","Todas."],
-  correct:0,
-  explain:"III é falsa: a adubação verde/cobertura morta TAMBÉM ajuda a dificultar o desenvolvimento de plantas invasoras."
-},
-{ id:"b15", culture:"banana", type:"block", mode:"VF", points:"1,0 ponto",
+    { text:"A sinuosidade de um curso d'água é definida pela relação entre o comprimento do rio principal e o comprimento do talvegue (linha de fundo de vale).",
+      answer:true, explain:"Correto." },
+    { text:"Quanto maior a declividade do leito do rio, menor a velocidade do escoamento.",
+      answer:false, explain:"Falso: maior declividade resulta em MAIOR velocidade do escoamento." },
+    { text:"O percurso médio do escoamento superficial (les) é inversamente proporcional à densidade de drenagem.",
+      answer:true, explain:"Correto: les = 1/(4·Dd) — quanto maior a densidade de drenagem, menor o percurso médio." },
+  ]},
+{ id:"hq18", topic:"bacia", type:"single", points:"1,0 ponto",
+  question:"Em relação ao tempo de concentração (tc) de uma bacia hidrográfica, é correto afirmar:",
+  options:["Quanto maior a declividade, maior o tc.",
+    "tc é o tempo necessário para que toda a bacia contribua para a vazão na seção de saída, contado a partir do início da precipitação.",
+    "tc independe da forma da bacia.",
+    "Bacias mais arredondadas (Kc próximo de 1) têm tc maior que bacias alongadas de mesma área.",
+    "tc não tem relação com o risco de enchentes."],
+  correct:1, explain:"tc é o tempo, a partir do início da chuva, para que toda a bacia contribua para a vazão na seção de saída." },
+{ id:"hq19", topic:"pegada", type:"block", mode:"VF", points:"1,5 ponto",
   instruction:"Julgue em Verdadeiro (V) ou Falso (F):",
   items:[
-    { text:"A banana tipo Prata/Pacovan classificada como 'loré' corresponde a frutos com até 14 cm de comprimento.", answer:true, explain:"Correto." },
-    { text:"Frutos com diâmetro entre 29 e 38 mm ou mais, e mais de 16 cm de comprimento, são classificados como tipo exportação.", answer:true, explain:"Correto." }
-  ]
-}
+    { text:"A água azul da pegada hídrica corresponde à água de rios, lagos e aquíferos efetivamente retirada para uso humano.",
+      answer:true, explain:"Correto." },
+    { text:"A água verde é a água retirada diretamente de mananciais superficiais para irrigação por aspersão.",
+      answer:false, explain:"Falso: água verde é a água da CHUVA armazenada no solo e usada pelas plantas — não é retirada de manancial." },
+    { text:"A pegada hídrica cinza representa o volume de água efetivamente consumido em um processo industrial.",
+      answer:false, explain:"Falso: a pegada cinza não é água consumida, e sim o volume TEÓRICO necessário para diluir a poluição lançada até padrões aceitáveis." },
+  ]},
+{ id:"hq20", topic:"pegada", type:"single", points:"1,0 ponto",
+  question:"Na fórmula da pegada hídrica cinza, PH_cinza = L / (Cmax − Cnat), o termo Cnat representa:",
+  options:["A concentração máxima do poluente permitida por lei.",
+    "A carga total do poluente lançada no corpo hídrico.",
+    "A concentração do poluente que ocorre naturalmente na água, sem interferência humana.",
+    "O volume total de água do corpo hídrico receptor.",
+    "A vazão do rio no ponto de lançamento."],
+  correct:2, explain:"Cnat é a concentração natural do poluente/substância na água, na ausência de atividade humana." },
+{ id:"hq21", topic:"pegada", type:"single", points:"1,0 ponto",
+  question:"O conceito de 'água virtual' está mais diretamente relacionado a:",
+  options:["A água que evapora antes de atingir o solo.",
+    "O volume de água embutido no comércio de um produto entre regiões ou países, mesmo sem transporte físico da água em si.",
+    "A água subterrânea não confirmada por sondagem.",
+    "A água reaproveitada em sistemas de reuso industrial.",
+    "A parcela do balanço hídrico correspondente ao ΔS."],
+  correct:1, explain:"Água virtual é o volume de água 'embutido' na produção de um bem, contabilizado quando esse bem é comercializado entre regiões/países." },
 ];
 
-let state = {}; // qid_or_itemkey -> {correct:bool}
+let state = {};
 let currentFilter = "todas";
-
 function itemKey(qid, idx){ return qid + "-" + idx; }
 
 function totalUnits(filter){
   let n = 0;
   quizData.forEach(q=>{
-    if(filter!=="todas" && q.culture!==filter) return;
+    if(filter!=="todas" && q.topic!==filter) return;
     if(q.type==="block") n += q.items.length; else n += 1;
   });
   return n;
 }
-
 function updateScore(){
   let total = totalUnits(currentFilter);
   let answered = 0, correct = 0;
   Object.keys(state).forEach(k=>{
-    if(currentFilter!=="todas" && state[k].culture!==currentFilter) return;
+    if(currentFilter!=="todas" && state[k].topic!==currentFilter) return;
     answered++;
     if(state[k].correct) correct++;
   });
-  document.getElementById("scoreTotal").textContent = total;
-  document.getElementById("scoreAnswered").textContent = answered;
-  document.getElementById("scoreCorrect").textContent = correct;
+  document.getElementById("h-scoreTotal").textContent = total;
+  document.getElementById("h-scoreAnswered").textContent = answered;
+  document.getElementById("h-scoreCorrect").textContent = correct;
 }
+
+const topicLabels = { ciclo:"💧 Ciclo Hidrológico", impactos:"🌍 Impactos Ambientais", bacia:"🗺️ Bacia Hidrográfica", pegada:"👣 Pegada Hídrica" };
 
 function renderQuiz(filter){
   currentFilter = filter;
-  const container = document.getElementById("quizContainer");
+  const container = document.getElementById("h-quizContainer");
   container.innerHTML = "";
-  let lastCulture = null;
+  let lastTopic = null;
   let qCounter = 0;
+  const letters = ["A","B","C","D","E"];
 
   quizData.forEach(q=>{
-    if(filter!=="todas" && q.culture!==filter) return;
+    if(filter!=="todas" && q.topic!==filter) return;
 
-    if(q.culture !== lastCulture){
-      lastCulture = q.culture;
+    if(q.topic !== lastTopic){
+      lastTopic = q.topic;
       const h = document.createElement("div");
-      h.className = "culture-heading";
-      h.textContent = (q.culture === "manga" ? "🥭 Manga" : "🍌 Banana");
+      h.className = "topic-heading";
+      h.textContent = topicLabels[q.topic];
       container.appendChild(h);
       qCounter = 0;
     }
@@ -625,10 +1138,9 @@ function renderQuiz(filter){
 
     const card = document.createElement("div");
     card.className = "card";
-
     const head = document.createElement("div");
     head.className = "q-head";
-    head.innerHTML = `<span class="q-num">Questão ${qCounter}</span><span class="q-points">${q.points}</span>`;
+    head.innerHTML = `<span class="h-q-num">Questão ${qCounter}</span><span class="h-q-points">${q.points}</span>`;
     card.appendChild(head);
 
     if(q.type === "block"){
@@ -636,7 +1148,6 @@ function renderQuiz(filter){
       instr.className = "q-instruction";
       instr.textContent = q.instruction;
       card.appendChild(instr);
-
       const labelTrue = q.mode === "CE" ? "C" : "V";
       const labelFalse = q.mode === "CE" ? "E" : "F";
 
@@ -644,26 +1155,19 @@ function renderQuiz(filter){
         const key = itemKey(q.id, idx);
         const row = document.createElement("div");
         row.className = "item-row";
-        row.id = "row-" + key;
-
         const txt = document.createElement("div");
         txt.className = "item-text";
         txt.innerHTML = item.text + `<div class="item-explain" id="explain-${key}"><b>Explicação:</b> ${item.explain}</div>`;
-
         const btnGroup = document.createElement("div");
         btnGroup.className = "btn-group";
-
         const btnT = document.createElement("button");
-        btnT.className = "vf-btn";
-        btnT.textContent = labelTrue;
+        btnT.className = "vf-btn"; btnT.textContent = labelTrue;
         const btnF = document.createElement("button");
-        btnF.className = "vf-btn";
-        btnF.textContent = labelFalse;
-
+        btnF.className = "vf-btn"; btnF.textContent = labelFalse;
         function answerItem(userVal){
-          if(state[key] !== undefined) return; // já respondido
+          if(state[key] !== undefined) return;
           const isCorrect = (userVal === item.answer);
-          state[key] = { correct:isCorrect, culture:q.culture };
+          state[key] = { correct:isCorrect, topic:q.topic };
           row.classList.add(isCorrect ? "correct" : "incorrect");
           document.getElementById("explain-"+key).classList.add("show");
           btnT.disabled = true; btnF.disabled = true;
@@ -671,24 +1175,17 @@ function renderQuiz(filter){
         }
         btnT.addEventListener("click", ()=>answerItem(true));
         btnF.addEventListener("click", ()=>answerItem(false));
-
-        btnGroup.appendChild(btnT);
-        btnGroup.appendChild(btnF);
-        row.appendChild(txt);
-        row.appendChild(btnGroup);
+        btnGroup.appendChild(btnT); btnGroup.appendChild(btnF);
+        row.appendChild(txt); row.appendChild(btnGroup);
         card.appendChild(row);
       });
-
     } else if(q.type === "single"){
       const qtext = document.createElement("div");
       qtext.className = "q-instruction";
       qtext.textContent = q.question;
       card.appendChild(qtext);
-
       const optWrap = document.createElement("div");
-      const letters = ["A","B","C","D","E"];
       const key = q.id;
-
       q.options.forEach((optText, idx)=>{
         const btn = document.createElement("button");
         btn.className = "option-btn";
@@ -696,10 +1193,9 @@ function renderQuiz(filter){
         btn.addEventListener("click", ()=>{
           if(state[key] !== undefined) return;
           const isCorrect = (idx === q.correct);
-          state[key] = { correct:isCorrect, culture:q.culture };
+          state[key] = { correct:isCorrect, topic:q.topic };
           Array.from(optWrap.children).forEach((child, cidx)=>{
-            child.classList.add("disabled");
-            child.disabled = true;
+            child.classList.add("disabled"); child.disabled = true;
             if(cidx === q.correct) child.classList.add("correct");
             if(cidx === idx && !isCorrect) child.classList.add("incorrect");
           });
@@ -724,20 +1220,354 @@ function renderQuiz(filter){
   updateScore();
 }
 
-document.querySelectorAll(".tab-btn").forEach(btn=>{
+document.querySelectorAll(".h-quiz-tab-btn").forEach(btn=>{
   btn.addEventListener("click", ()=>{
-    document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+    document.querySelectorAll(".h-quiz-tab-btn").forEach(b=>b.classList.remove("active"));
     btn.classList.add("active");
     renderQuiz(btn.dataset.filter);
   });
 });
 
-document.getElementById("resetBtn").addEventListener("click", ()=>{
+document.getElementById("h-resetBtn").addEventListener("click", ()=>{
   state = {};
   renderQuiz(currentFilter);
 });
 
 renderQuiz("todas");
+})();
+
+/* ==================================================================
+   OLERICULTURA — IIFE isolado (usa classes/ids originais, sem prefixo)
+   ================================================================== */
+(function(){
+document.querySelectorAll(".maintab-btn").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    document.querySelectorAll(".maintab-btn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    const page = btn.dataset.page;
+    document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+    document.getElementById("page-"+page).classList.add("active");
+    document.getElementById("subnav").style.display = (page==="revisao") ? "flex" : "none";
+    window.scrollTo({top:0, behavior:"smooth"});
+  });
+});
+
+const qaData = [
+{ crop:"alface", n:1, question:"Explique por que as altas temperaturas afetaram negativamente a germinação das sementes de alface.",
+  answer:"A temperatura ótima de germinação da alface é ~20°C; acima de 30°C a maioria das cultivares perde a capacidade germinativa. Sob calor durante a embebição, o pericarpo restringe mecanicamente a expansão do embrião, e o eixo embrionário não desenvolve potencial de crescimento suficiente para romper essa barreira física — resultando em inibição da germinação (termoinibição, ou em casos mais severos, termodormência)." },
+{ crop:"alface", n:2, question:"Diferencie termoinibição de termodormência, e explique qual fenômeno provavelmente ocorreu.",
+  answer:"Termoinibição é reversível: a semente não germina no calor, mas volta a germinar normalmente ao retornar a temperaturas adequadas (15–22°C). Termodormência (dormência secundária) é persistente: a semente não germina mesmo após o retorno a temperaturas favoráveis. No caso descrito, o mais provável é termoinibição, já que é o quadro mais comum e reversível causado por exposição térmica durante a embebição; a termodormência tende a ocorrer apenas sob exposição ao calor mais prolongada/intensa." },
+{ crop:"alface", n:3, question:"Qual a relação entre luz, fitocromo e germinação da alface? Explique o papel de Pr e Pfr.",
+  answer:"A germinação de sementes fotossensíveis de alface é regulada pelo fitocromo, pigmento fotomorfogenético com duas formas fotoconversíveis: Pr (absorve luz vermelha ~660nm, forma inativa) e Pfr (absorve vermelho-distante ~730nm, forma ativa que estimula a germinação). Luz vermelha converte Pr→Pfr e promove germinação; luz vermelho-distante ou escuro reverte Pfr→Pr e inibe a germinação. A sensibilidade a esse controle aumenta com a temperatura — em temperaturas mais altas, a exigência de luz (Pfr) para germinar se torna mais crítica." },
+{ crop:"alface", n:4, question:"Por que o excesso de nitrogênio favoreceu crescimento excessivo, menor qualidade comercial e maior suscetibilidade fisiológica?",
+  answer:"O excesso de N estimula crescimento vegetativo acelerado e desproporcional, com tecidos mais suculentos e paredes celulares mais finas — folhas maiores, porém menos consistentes (menor qualidade comercial: pior firmeza e conservação). Esse crescimento acelerado da lâmina foliar ultrapassa a capacidade de translocação de cálcio via xilema até as bordas das folhas jovens, favorecendo o tipburn (maior suscetibilidade fisiológica); tecidos mais tenros também ficam mais atrativos a pragas e doenças." },
+{ crop:"alface", n:5, question:"Explique fisiologicamente a ocorrência do tipburn, abordando mobilidade do cálcio, transpiração, crescimento acelerado e folhas internas.",
+  answer:"O cálcio é transportado quase exclusivamente pelo xilema, seguindo o fluxo transpiratório, com mobilidade praticamente nula via floema (não é redistribuído de folhas velhas para novas). Folhas jovens em expansão rápida transpiram pouco (cutícula pouco desenvolvida) e por isso recebem pouco Ca via xilema — justamente quando a demanda é maior devido ao crescimento acelerado. As folhas internas, mais protegidas do ar externo (menor déficit de pressão de vapor ao redor), transpiram ainda menos, concentrando o problema nelas. O resultado é necrose nos bordos por deficiência localizada de cálcio." },
+{ crop:"alface", n:6, question:"O tipburn ocorreu necessariamente por falta de cálcio no solo? Justifique.",
+  answer:"Não necessariamente. Na maioria dos casos o solo tem cálcio disponível suficiente — o problema é fisiológico/de transporte interno: a baixa transpiração das folhas jovens/internas limita o fluxo de Ca via xilema até esses tecidos, mesmo com solo bem suprido. Por isso apenas elevar o Ca do solo (calagem) tem efeito limitado; o manejo mais eficaz é irrigação frequente e regular, e adubação de cálcio parcelada junto com nitrogênio." },
+{ crop:"alface", n:7, question:"Explique a relação entre altas temperaturas, pendoamento precoce, produção de giberelinas e sabor amargo.",
+  answer:"Temperaturas acima de 20°C (agravadas por dias longos) sinalizam à planta o fim do ciclo vegetativo, estimulando a síntese endógena de giberelinas — hormônios que promovem o alongamento do caule (formação do pendão floral) e antecipam o florescimento. Junto ao pendoamento, a planta aumenta a produção de látex (compostos amargos), conferindo sabor amargo às folhas e tornando a alface comercialmente imprópria." },
+{ crop:"alface", n:8, question:"Por que o excesso de irrigação pode ter contribuído para escurecimento das raízes, redução da absorção de nutrientes e queda da qualidade fisiológica?",
+  answer:"O excesso de água satura os poros do solo, reduzindo a oxigenação das raízes (hipóxia/anaerobiose). Isso favorece a proliferação de patógenos de solo (como Pythium e Rhizoctonia) e leva à necrose/escurecimento do tecido radicular. Raízes danificadas perdem capacidade funcional de absorção de água e nutrientes, comprometendo o estado nutricional e a qualidade fisiológica da planta, mesmo com adubação adequada." },
+{ crop:"alface", n:9, question:"Explique como a elevada condutividade elétrica (CE) afetou absorção de água, crescimento das plantas e sistema radicular.",
+  answer:"CE elevada indica alta concentração de sais na solução do solo, o que reduz o potencial osmótico dessa solução — a diferença de potencial hídrico entre solo e raiz diminui, dificultando a absorção de água pela planta (efeito de 'seca fisiológica' mesmo com solo úmido). Isso reduz a turgescência celular e retarda o crescimento. No sistema radicular, o estresse salino pode causar plasmólise, redução de pelos radiculares e menor área efetiva de absorção, além de possível toxicidade iônica direta." },
+{ crop:"alface", n:10, question:"A deterioração interna observada nas plantas pode estar relacionada a qual distúrbio fisiológico? Explique.",
+  answer:"Está relacionada ao tipburn interno: a necrose dos bordos das folhas jovens internas (por deficiência localizada de cálcio, decorrente da baixa transpiração desses tecidos) muitas vezes não é visível externamente em tipos repolhudos/crespos — só é percebida ao abrir a cabeça da planta, caracterizando a 'deterioração interna'." },
+{ crop:"alface", n:11, question:"Quais fatores contribuíram para a redução da vida útil pós-colheita?",
+  answer:"Calor de campo residual no momento da colheita, ausência ou atraso do pré-resfriamento/hidrorresfriamento, quebra da cadeia do frio durante transporte e distribuição, dano mecânico às folhas (aumenta a superfície exposta à transpiração e à entrada de patógenos), e o próprio estado fisiológico debilitado da planta por tipburn e/ou pendoamento antes da colheita." },
+{ crop:"alface", n:12, question:"Explique a relação entre respiração, transpiração, temperatura e conservação pós-colheita.",
+  answer:"A temperatura controla diretamente a taxa metabólica: quanto maior a temperatura, maior a taxa respiratória, que consome reservas energéticas e libera calor vital, elevando ainda mais a temperatura do produto (retroalimentação positiva). Em paralelo, a transpiração excessiva causa perda de água e murcha. Reduzir a temperatura (resfriamento rápido/refrigeração) é a estratégia mais eficaz para reduzir simultaneamente respiração e transpiração, retardando a senescência e preservando turgidez, cor, crocância e vida útil." },
+
+{ crop:"cenoura", n:"a", question:"Explique por que solos muito argilosos e compactados prejudicam o desenvolvimento e a qualidade comercial das raízes de cenoura.",
+  answer:"A raiz tuberosa da cenoura precisa se expandir radialmente empurrando o solo ao redor. Em solo argiloso/compactado, a alta resistência mecânica e a baixa porosidade desviam o crescimento do ápice radicular ao encontrar torrões ou camadas compactadas, gerando raízes curtas, tortas ou bifurcadas ('garfadas'). Além disso, a menor aeração e drenagem favorecem encharcamento e apodrecimento, e a maior resistência à emergência reduz a uniformidade do estande — tudo isso prejudica diretamente o padrão comercial (formato, comprimento e uniformidade das raízes)." },
+{ crop:"cenoura", n:"b", question:"Descreva a influência da temperatura no ciclo da cultura e na formação de raízes de boa qualidade.",
+  answer:"Temperaturas de 10–15°C favorecem o alongamento da raiz e o desenvolvimento da coloração alaranjada característica. Acima de 21°C a raiz tende a ficar curta e com coloração deficiente, e acima de 30°C o ciclo vegetativo é reduzido, prejudicando tanto o desenvolvimento radicular quanto a produtividade. A germinação ocorre entre 8–35°C, com faixa ideal de 20–30°C. Temperaturas baixas associadas a dias longos induzem florescimento precoce (vernalização), o que desvia recursos da raiz para a haste floral, prejudicando a qualidade comercial." },
+{ crop:"cenoura", n:"c", question:"Quais são os principais efeitos do excesso de nitrogênio na cultura da cenoura, especialmente na parte aérea e na raiz?",
+  answer:"O excesso de N desloca o balanço fonte-dreno em favor da parte aérea: folhagem exuberante e crescimento vegetativo vigoroso, em detrimento do enchimento e maturação da raiz. Isso atrasa a colheita, reduz o teor de açúcares e a qualidade da raiz, pode aumentar a incidência de bifurcações, favorece acamamento da folhagem e cria um microclima mais úmido dentro da copa, aumentando a suscetibilidade a doenças foliares como a queima-das-folhas." },
+{ crop:"cenoura", n:"d", question:"Cite duas práticas de manejo que contribuem para raízes uniformes e de maior padrão comercial.",
+  answer:"(1) Desbaste adequado, garantindo espaçamento correto entre plantas e evitando competição, que causa raízes tortas e finas por adensamento excessivo. (2) Preparo profundo e adequado do solo (aração + gradagem + canteiros bem formados, sem camadas compactadas), que permite o crescimento livre e retilíneo da raiz. Complementarmente: calagem antecipada (3 meses antes do plantio, pH 6,0–6,5) e adubação equilibrada conforme análise de solo." },
+{ crop:"cenoura", n:"e", question:"Como o crescimento e o florescimento da cenoura são afetados pela temperatura?",
+  answer:"A cenoura tem uma janela térmica relativamente estreita para produção ideal de raiz: temperaturas amenas (10–15°C) favorecem alongamento e coloração da raiz, mas o mesmo frio combinado com fotoperíodo longo dispara o florescimento precoce (vernalização) — fenômeno indesejável, pois desvia energia da raiz para a haste floral, deixando a raiz fibrosa, lenhosa e de sabor amargo. Já o calor excessivo (>30°C) encurta o ciclo vegetativo e prejudica tanto o tamanho quanto a coloração da raiz. Por isso a escolha da cultivar deve considerar a época de plantio: cultivares do grupo Nantes para clima frio, e Kuroda/Brasília/Kuronan para clima quente." },
+];
+
+const qaContainer = document.getElementById("qaContainer");
+let qaFilter = "todas";
+function renderQA(filter){
+  qaFilter = filter;
+  qaContainer.innerHTML = "";
+  qaData.forEach(q=>{
+    if(filter!=="todas" && q.crop!==filter) return;
+    const card = document.createElement("div");
+    card.className = "qa-card " + q.crop;
+    const num = document.createElement("span");
+    num.className = "qa-num";
+    num.textContent = (q.crop==="alface"?"Alface":"Cenoura") + " — Q" + q.n;
+    card.appendChild(num);
+    const qtext = document.createElement("div");
+    qtext.className = "qa-question";
+    qtext.textContent = q.question;
+    card.appendChild(qtext);
+    const btn = document.createElement("button");
+    btn.className = "qa-reveal-btn";
+    btn.textContent = "Mostrar resposta-modelo";
+    const ans = document.createElement("div");
+    ans.className = "qa-answer";
+    ans.textContent = q.answer;
+    btn.addEventListener("click", ()=>{
+      ans.classList.toggle("show");
+      btn.textContent = ans.classList.contains("show") ? "Ocultar resposta-modelo" : "Mostrar resposta-modelo";
+    });
+    card.appendChild(btn);
+    card.appendChild(ans);
+    qaContainer.appendChild(card);
+  });
+
+  if(filter!=="alface"){
+    const essayWrap = document.createElement("div");
+    essayWrap.className = "qa-card cenoura";
+    essayWrap.innerHTML = `
+      <span class="qa-num">Cenoura — Questão dissertativa (até 2 páginas)</span>
+      <div class="qa-question">Discussão técnica: clima quente do Agreste sobre a cultivar 'Nantes' · métodos de redução de Alternaria em sistemas diversificados · desempenho orgânico x convencional · viabilidade de cultivo protegido.</div>
+      <div class="essay-box">
+        <h4 class="c">1. Impacto do clima quente do Agreste na cultivar 'Nantes'</h4>
+        <p>O Agreste nordestino combina temperaturas elevadas com períodos de alta umidade — justamente as condições às quais a Nantes é mais sensível. Por ser uma cultivar de origem francesa, de clima temperado/ameno, seu desempenho no calor é prejudicado em duas frentes: (i) fisiológica — temperaturas acima de 21°C reduzem o comprimento e a coloração da raiz, e acima de 30°C encurtam o ciclo, penalizando produtividade e padrão comercial; (ii) fitossanitária — a Nantes é a mais suscetível à queima-das-folhas (Alternaria dauci), doença favorecida justamente por calor e alta umidade, exigindo aplicações preventivas intensivas de fungicida, o que eleva custo de produção e risco de resíduos. Na prática, cultivares mais tolerantes ao calor e resistentes à Alternaria (Brasília, Kuroda, Kuronan) tendem a ser tecnicamente mais adequadas ao Agreste do que a Nantes, a menos que o cultivo seja concentrado na estação mais amena do ano ou em ambiente protegido/altitude elevada.</p>
+        <h4 class="c">2. Métodos de redução de Alternaria em sistemas diversificados</h4>
+        <p>Sistemas diversificados (rotação e consórcio de culturas, quebra-ventos, cultivo em faixas) reduzem a pressão de Alternaria dauci por diminuir a continuidade espacial/temporal do hospedeiro, dificultando a disseminação de esporos entre plantios sucessivos de cenoura. Práticas complementares incluem: rotação de culturas com espécies não hospedeiras (quebra do ciclo do patógeno no solo/restos culturais), uso de sementes sadias/tratadas, espaçamento adequado (reduz umidade relativa dentro do dossel), evitar irrigação por aspersão em horários que prolonguem o molhamento foliar (preferir gotejamento), manejo de restos culturais (remoção/incorporação para reduzir inóculo residual), e escolha de cultivares com resistência de campo (Brasília, Kuroda, Kuronan). O controle químico preventivo com fungicidas cúpricos e ditiocarbamatos continua sendo necessário em cultivares suscetíveis, mas em sistemas diversificados bem manejados a pressão de doença — e, portanto, o número de aplicações — tende a ser menor.</p>
+        <h4 class="c">3. Desempenho da cenoura orgânica vs. convencional</h4>
+        <p>No sistema convencional, o uso de fertilizantes minerais solúveis e defensivos químicos permite maior controle e previsibilidade sobre nutrição e fitossanidade, geralmente resultando em maior produtividade e uniformidade das raízes no curto prazo, mas com maior dependência de insumos externos e risco de resíduos/degradação do solo a longo prazo. No sistema orgânico, a adubação orgânica (esterco bem curtido, compostos) melhora a estrutura física do solo e a atividade biológica, o que é especialmente vantajoso em solos de baixa fertilidade ou compactados — mas a liberação de nutrientes é mais lenta e menos previsível, podendo limitar picos de demanda da cultura (especialmente K e N em fases críticas), e o controle de Alternaria depende mais de práticas culturais e produtos biológicos/cúpricos, exigindo manejo mais criterioso. Produtividade tende a ser um pouco menor no orgânico, mas com raízes de qualidade sensorial competitiva e valor agregado de mercado superior.</p>
+        <h4 class="c">4. Viabilidade de cultivo protegido e impacto na qualidade</h4>
+        <p>O cultivo protegido (estufa, telado, sombreamento) é tecnicamente viável para reduzir a amplitude térmica e a exposição direta à chuva — dois fatores centrais tanto no estresse por calor quanto na pressão de Alternaria (que depende de água livre na folha). Isso permite cultivar cultivares mais exigentes em clima ameno, como a Nantes, mesmo em regiões mais quentes, além de reduzir o número de aplicações fitossanitárias. Os principais entraves à viabilidade são o custo de implantação/manutenção da estrutura e o manejo mais intensivo (ventilação, umidade), que podem inviabilizar economicamente pequenas propriedades. Em termos de qualidade, o ambiente protegido tende a gerar raízes mais uniformes, com coloração mais estável e menor incidência de defeitos fisiológicos e fitossanitários, compensando o investimento em produções de maior valor agregado (mercado in natura selecionado, exportação).</p>
+      </div>
+    `;
+    qaContainer.appendChild(essayWrap);
+  }
+}
+document.querySelectorAll(".qa-tab-btn").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    document.querySelectorAll(".qa-tab-btn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    renderQA(btn.dataset.qafilter);
+  });
+});
+renderQA("todas");
+
+const quizData2 = [
+{ id:"q1", crop:"alface", type:"block", mode:"VF", points:"1,5 ponto",
+  instruction:"Julgue em Verdadeiro (V) ou Falso (F):",
+  items:[
+    { text:"A termoinibição da germinação de sementes de alface é um processo reversível.", answer:true, explain:"Correto: a germinação retorna ao normal quando a temperatura volta a níveis adequados." },
+    { text:"A termodormência, ao contrário da termoinibição, persiste mesmo após a redução da temperatura.", answer:true, explain:"Correto: é a dormência secundária, mais severa e persistente." },
+    { text:"A forma Pr do fitocromo é a responsável por estimular a germinação da semente de alface.", answer:false, explain:"Falso: é a forma Pfr (ativada por luz vermelha) que estimula a germinação." },
+  ]},
+{ id:"q2", crop:"alface", type:"single", points:"1,0 ponto",
+  question:"A temperatura ótima de germinação da alface está em torno de:",
+  options:["10 °C","20 °C","30 °C","35 °C","5 °C"],
+  correct:1, explain:"A temperatura ótima é ~20°C; acima de 30°C a maioria das cultivares perde capacidade germinativa." },
+{ id:"q3", crop:"alface", type:"single", points:"1,0 ponto",
+  question:"O tipburn da alface está diretamente relacionado à baixa mobilidade de qual nutriente?",
+  options:["Nitrogênio","Potássio","Cálcio","Magnésio","Fósforo"],
+  correct:2, explain:"O cálcio se move quase exclusivamente pelo xilema (via transpiração) e tem mobilidade nula no floema." },
+{ id:"q4", crop:"alface", type:"block", mode:"VF", points:"1,5 ponto",
+  instruction:"Julgue em Verdadeiro (V) ou Falso (F):",
+  items:[
+    { text:"O tipburn ocorre necessariamente por falta de cálcio no solo.", answer:false, explain:"Falso: é um problema de transporte interno (baixa transpiração das folhas jovens/internas), mesmo com Ca suficiente no solo." },
+    { text:"O pendoamento precoce da alface está associado ao aumento da síntese de giberelinas sob calor.", answer:true, explain:"Correto." },
+    { text:"O sabor amargo associado ao pendoamento é causado pela produção de látex.", answer:true, explain:"Correto." },
+  ]},
+{ id:"q5", crop:"alface", type:"single", points:"1,0 ponto",
+  question:"Uma condutividade elétrica (CE) do solo acima de 1,3 dS/m antes da fertirrigação da alface indica que se deve:",
+  options:["Aplicar dose dobrada de N-P-K.","Aplicar apenas água pura, sem fertilizante.","Suspender totalmente a irrigação.","Aplicar calcário imediatamente.","Aumentar a frequência de adubação foliar."],
+  correct:1, explain:"CE elevada indica excesso de sais — aplicar mais fertilizante pioraria o estresse salino." },
+{ id:"q6", crop:"alface", type:"single", points:"1,0 ponto",
+  question:"Sobre a pós-colheita da alface, a principal razão para reduzir a temperatura do produto o mais rápido possível é:",
+  options:["Melhorar a coloração das folhas.","Reduzir simultaneamente a taxa de respiração e de transpiração.","Aumentar a produção de látex.","Estimular o pendoamento controlado.","Reduzir a condutividade elétrica do tecido."],
+  correct:1, explain:"O resfriamento rápido reduz respiração e transpiração, retardando a senescência." },
+{ id:"q7", crop:"cenoura", type:"block", mode:"VF", points:"1,5 ponto",
+  instruction:"Julgue em Verdadeiro (V) ou Falso (F):",
+  items:[
+    { text:"Solos muito argilosos e compactados favorecem a formação de raízes de cenoura mais longas e uniformes.", answer:false, explain:"Falso: causam o oposto — raízes curtas, tortas ou bifurcadas." },
+    { text:"Temperaturas entre 10 e 15°C favorecem o alongamento e a coloração da raiz de cenoura.", answer:true, explain:"Correto." },
+    { text:"Temperaturas baixas associadas a dias longos podem induzir florescimento precoce na cenoura.", answer:true, explain:"Correto: é o efeito de vernalização." },
+  ]},
+{ id:"q8", crop:"cenoura", type:"single", points:"1,0 ponto",
+  question:"Qual cultivar de cenoura é descrita como a mais suscetível à queima-das-folhas (Alternaria), exigindo clima ameno/frio?",
+  options:["Brasília","Kuroda","Kuronan","Nantes","Tropical"],
+  correct:3, explain:"A Nantes é a mais suscetível à queima-das-folhas e exige clima ameno, não sendo recomendada para estações quentes/chuvosas." },
+{ id:"q9", crop:"cenoura", type:"single", points:"1,0 ponto",
+  question:"O principal agente causador da queima-das-folhas (doença mais comum da cenoura) é:",
+  options:["Xanthomonas campestris pv. carotae","Cercospora carotae","Alternaria dauci","Pythium sp.","Rhizoctonia solani"],
+  correct:2, explain:"Alternaria dauci é o agente mais comum, embora Cercospora e Xanthomonas também possam estar presentes na mesma lesão." },
+{ id:"q10", crop:"cenoura", type:"single", points:"1,0 ponto",
+  question:"O excesso de nitrogênio na cultura da cenoura tende a causar principalmente:",
+  options:["Redução do crescimento foliar e aumento do enchimento de raiz.",
+    "Crescimento vegetativo excessivo da parte aérea em detrimento da maturação da raiz.",
+    "Aumento imediato do teor de açúcares da raiz.",
+    "Redução da suscetibilidade a doenças foliares.",
+    "Encurtamento do ciclo da cultura."],
+  correct:1, explain:"O excesso de N favorece a parte aérea às custas do enchimento/maturação da raiz, atrasando a colheita e reduzindo qualidade." },
+];
+
+let ostate = {};
+let ocurrentFilter = "todas";
+function oitemKey(qid, idx){ return qid + "-" + idx; }
+
+function ototalUnits(filter){
+  let n = 0;
+  quizData2.forEach(q=>{
+    if(filter!=="todas" && q.crop!==filter) return;
+    if(q.type==="block") n += q.items.length; else n += 1;
+  });
+  return n;
+}
+function oupdateScore(){
+  let total = ototalUnits(ocurrentFilter);
+  let answered = 0, correct = 0;
+  Object.keys(ostate).forEach(k=>{
+    if(ocurrentFilter!=="todas" && ostate[k].crop!==ocurrentFilter) return;
+    answered++;
+    if(ostate[k].correct) correct++;
+  });
+  document.getElementById("scoreTotal").textContent = total;
+  document.getElementById("scoreAnswered").textContent = answered;
+  document.getElementById("scoreCorrect").textContent = correct;
+}
+
+const cropLabels = { alface:"🥬 Alface", cenoura:"🥕 Cenoura" };
+
+function orenderQuiz(filter){
+  ocurrentFilter = filter;
+  const container = document.getElementById("quizContainer");
+  container.innerHTML = "";
+  let lastCrop = null;
+  let qCounter = 0;
+  const letters = ["A","B","C","D","E"];
+
+  quizData2.forEach(q=>{
+    if(filter!=="todas" && q.crop!==filter) return;
+
+    if(q.crop !== lastCrop){
+      lastCrop = q.crop;
+      const h = document.createElement("div");
+      h.className = "topic-heading";
+      h.textContent = cropLabels[q.crop];
+      container.appendChild(h);
+      qCounter = 0;
+    }
+    qCounter++;
+
+    const card = document.createElement("div");
+    card.className = "card";
+    const head = document.createElement("div");
+    head.className = "q-head";
+    head.innerHTML = `<span class="q-num">Questão ${qCounter}</span><span class="q-points">${q.points}</span>`;
+    card.appendChild(head);
+
+    if(q.type === "block"){
+      const instr = document.createElement("div");
+      instr.className = "q-instruction";
+      instr.textContent = q.instruction;
+      card.appendChild(instr);
+      const labelTrue = q.mode === "CE" ? "C" : "V";
+      const labelFalse = q.mode === "CE" ? "E" : "F";
+
+      q.items.forEach((item, idx)=>{
+        const key = oitemKey(q.id, idx);
+        const row = document.createElement("div");
+        row.className = "item-row";
+        const txt = document.createElement("div");
+        txt.className = "item-text";
+        txt.innerHTML = item.text + `<div class="item-explain" id="oexplain-${key}"><b>Explicação:</b> ${item.explain}</div>`;
+        const btnGroup = document.createElement("div");
+        btnGroup.className = "btn-group";
+        const btnT = document.createElement("button");
+        btnT.className = "vf-btn"; btnT.textContent = labelTrue;
+        const btnF = document.createElement("button");
+        btnF.className = "vf-btn"; btnF.textContent = labelFalse;
+        function answerItem(userVal){
+          if(ostate[key] !== undefined) return;
+          const isCorrect = (userVal === item.answer);
+          ostate[key] = { correct:isCorrect, crop:q.crop };
+          row.classList.add(isCorrect ? "correct" : "incorrect");
+          document.getElementById("oexplain-"+key).classList.add("show");
+          btnT.disabled = true; btnF.disabled = true;
+          oupdateScore();
+        }
+        btnT.addEventListener("click", ()=>answerItem(true));
+        btnF.addEventListener("click", ()=>answerItem(false));
+        btnGroup.appendChild(btnT); btnGroup.appendChild(btnF);
+        row.appendChild(txt); row.appendChild(btnGroup);
+        card.appendChild(row);
+      });
+    } else if(q.type === "single"){
+      const qtext = document.createElement("div");
+      qtext.className = "q-instruction";
+      qtext.textContent = q.question;
+      card.appendChild(qtext);
+      const optWrap = document.createElement("div");
+      const key = q.id;
+      q.options.forEach((optText, idx)=>{
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.innerHTML = `<b>${letters[idx]})</b> ${optText}`;
+        btn.addEventListener("click", ()=>{
+          if(ostate[key] !== undefined) return;
+          const isCorrect = (idx === q.correct);
+          ostate[key] = { correct:isCorrect, crop:q.crop };
+          Array.from(optWrap.children).forEach((child, cidx)=>{
+            child.classList.add("disabled"); child.disabled = true;
+            if(cidx === q.correct) child.classList.add("correct");
+            if(cidx === idx && !isCorrect) child.classList.add("incorrect");
+          });
+          const exp = document.getElementById("osingle-explain-"+key);
+          exp.classList.add("show");
+          oupdateScore();
+        });
+        optWrap.appendChild(btn);
+      });
+      card.appendChild(optWrap);
+
+      const exp = document.createElement("div");
+      exp.className = "single-explain";
+      exp.id = "osingle-explain-"+key;
+      exp.innerHTML = `<b>Explicação:</b> ${q.explain}`;
+      card.appendChild(exp);
+    }
+
+    container.appendChild(card);
+  });
+
+  oupdateScore();
+}
+
+document.querySelectorAll("#page-simulado .quiz-tab-btn").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    document.querySelectorAll("#page-simulado .quiz-tab-btn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    orenderQuiz(btn.dataset.filter);
+  });
+});
+
+document.getElementById("resetBtn").addEventListener("click", ()=>{
+  ostate = {};
+  orenderQuiz(ocurrentFilter);
+});
+
+orenderQuiz("todas");
+})();
+
+/* ==================================================================
+   TOPO — alternância entre disciplinas
+   ================================================================== */
+document.querySelectorAll(".disc-btn").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    document.querySelectorAll(".disc-btn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    const disc = btn.dataset.disc;
+    document.querySelectorAll(".discipline").forEach(d=>d.classList.remove("active"));
+    document.getElementById("disc-"+disc).classList.add("active");
+    window.scrollTo({top:0, behavior:"smooth"});
+  });
+});
 </script>
 </body>
 </html>
